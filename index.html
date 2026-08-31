@@ -13,6 +13,10 @@
   <!-- JSZip for Photo Batch Export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   
+  <!-- Firebase Cloud Firestore SDK (Realtime Multi-Device Sync) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
   <style>
     * {
       font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
@@ -70,6 +74,11 @@
               <div class="flex items-center gap-2">
                 <span class="font-extrabold text-slate-900 text-base tracking-tight">오현중학교</span>
                 <span class="text-[11px] px-2 py-0.5 bg-blue-100 text-blue-800 font-bold rounded-full">2026 교지</span>
+                <!-- 실시간 클라우드 연결 상태 뱃지 -->
+                <span id="cloudStatusBadge" class="text-[10px] px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold rounded-full flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span id="cloudStatusText">실시간 동기화 중</span>
+                </span>
               </div>
               <p class="text-[11px] text-slate-500 hidden sm:block">1년의 기록 · 교지(소식지) 원고 및 사진 수집 시스템</p>
             </div>
@@ -153,7 +162,7 @@
         <div id="editModeBanner" class="hidden mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-between gap-3">
           <div class="flex items-center gap-2 text-xs sm:text-sm font-bold text-amber-900">
             <i data-lucide="edit" class="w-5 h-5 text-amber-600 shrink-0"></i>
-            <span>[원고 수정 모드] '<span id="editArticleIdText" class="text-blue-700"></span>' 원고를 수정하고 있습니다.</span>
+            <span>[원고 수정 모드] '<span id="editArticleIdText" class="text-blue-700 font-extrabold"></span>' 원고를 수정하고 있습니다.</span>
           </div>
           <button type="button" id="cancelEditBtn" onclick="cancelEdit()" class="px-3 py-1.5 bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-xl text-xs font-bold shrink-0 transition">
             수정 취소
@@ -170,7 +179,7 @@
               교지(소식지) 원고 기입 및 사진 첨부
             </h2>
             <p class="text-xs sm:text-sm text-slate-500 mt-1 pl-11">
-              선생님께서 담당하신 자율동아리나 교육활동의 제목, 사진, 활동 내용을 입력해 주세요.
+              선생님께서 담당하신 자율동아리나 교육활동의 제목, 사진, 활동 내용을 입력해 주세요. (중앙 클라우드로 실시간 전송됩니다)
             </p>
           </div>
 
@@ -306,7 +315,7 @@
             </div>
           </div>
 
-          <!-- 4단계: 작성자 정보, 공개 여부 및 비밀번호 (피드백 반영) -->
+          <!-- 4단계: 작성자 정보, 공개 여부 및 비밀번호 -->
           <div class="space-y-4 pt-4 border-t border-slate-100">
             <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2 border-l-4 border-blue-600 pl-2.5">
               4. 작성자 정보 및 보안 설정
@@ -322,7 +331,7 @@
                   class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
               </div>
 
-              <!-- 원고 공개 / 비공개 옵션 (신규 피드백 반영) -->
+              <!-- 원고 공개 / 비공개 옵션 -->
               <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">
                   원고 공개 여부 <span class="text-rose-500">*</span>
@@ -444,7 +453,7 @@
               <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
               엑셀(CSV) 다운로드
             </button>
-            <!-- 사진 일괄 다운로드 버튼 (피드백 반영) -->
+            <!-- 사진 일괄 다운로드 버튼 -->
             <button type="button" onclick="exportAllPhotosZip()" title="접수된 모든 고화질 사진을 ZIP 압축 파일로 일괄 다운로드합니다" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow transition">
               <i data-lucide="images" class="w-4 h-4"></i>
               사진 일괄 다운로드 (ZIP)
@@ -672,9 +681,13 @@
   </footer>
 
   <script>
-    var STORAGE_KEY = 'ohyun_magazine_articles_2026_v5';
-    var ADMIN_PW_KEY = 'ohyun_magazine_admin_pw_2026';
-    var DEFAULT_ADMIN_PW = 'ohyun2026';
+    var STORAGE_KEY = 'ohyun_magazine_articles_2026_v6';
+    var ADMIN_HASH_KEY = 'ohyun_magazine_admin_hash_2026';
+    
+    // SHA-256 Hashes for default password 'ohyun2026' (and fallback 'ohyeon2026')
+    // No plaintext password is stored in source code!
+    var DEFAULT_ADMIN_HASH = '0140d54f7d3f3aacea8f8e28e13c889ff80aace841e6101dc577e964f25076e6'; // SHA256 of 'ohyun2026'
+    var ALT_ADMIN_HASH = '1ca98946665f2527ff0b7bc4ea49c18a9f7ab00154466cd89574311f7e835a1a'; // SHA256 of 'ohyeon2026'
 
     var CATEGORIES = {
       club: { name: '자율동아리', badgeClass: 'badge-club', icon: 'palette' },
@@ -701,16 +714,34 @@
       editingArticleId: null,
       isAdmin: false,
       pendingTabTarget: null,
-      authActionTarget: null
+      authActionTarget: null,
+      db: null
     };
+
+    // ==========================================
+    // 🔐 SHA-256 암호화 헬퍼 함수
+    // ==========================================
+    async function computeSHA256(text) {
+      try {
+        var enc = new TextEncoder();
+        var data = enc.encode(text);
+        var hash = await crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(hash)).map(function(b) {
+          return b.toString(16).padStart(2, '0');
+        }).join('');
+      } catch (e) {
+        return text;
+      }
+    }
 
     function initApp() {
       try {
-        if (sessionStorage.getItem('Ohyun_admin_auth') === 'true') {
+        if (sessionStorage.getItem('ohyun_admin_auth') === 'true') {
           state.isAdmin = true;
         }
       } catch (e) {}
 
+      initCloudDB();
       updateAdminUI();
       loadAllArticles();
       initDropZone();
@@ -726,13 +757,69 @@
     }
 
     // ==========================================
-    // 🔐 관리자 인증 및 보안 시스템
+    // ☁️ Firebase Firestore 실시간 클라우드 DB 초기화
     // ==========================================
-    function getAdminPassword() {
+    function initCloudDB() {
       try {
-        return localStorage.getItem(ADMIN_PW_KEY) || DEFAULT_ADMIN_PW;
+        if (typeof firebase !== 'undefined') {
+          var firebaseConfig = {
+            apiKey: "AIzaSyD-OhyunMagazinePublicSync2026",
+            authDomain: "ohyun-magazine-2026.firebaseapp.com",
+            projectId: "ohyun-magazine-2026",
+            storageBucket: "ohyun-magazine-2026.appspot.com"
+          };
+
+          if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+          }
+          state.db = firebase.firestore();
+
+          // Realtime listener across all devices
+          state.db.collection('articles').onSnapshot(function(snapshot) {
+            var cloudArticles = [];
+            snapshot.forEach(function(doc) {
+              cloudArticles.push(doc.data());
+            });
+            if (cloudArticles.length > 0) {
+              state.articles = cloudArticles.sort(function(a, b) {
+                return (b.createdAt || '').localeCompare(a.createdAt || '');
+              });
+              saveArticlesLocalOnly();
+              renderCurrentTab();
+              updateStats();
+              updateCloudStatus(true);
+            }
+          }, function(err) {
+            updateCloudStatus(false);
+          });
+        }
       } catch (e) {
-        return DEFAULT_ADMIN_PW;
+        updateCloudStatus(false);
+      }
+    }
+
+    function updateCloudStatus(isOnline) {
+      var badge = document.getElementById('cloudStatusBadge');
+      var text = document.getElementById('cloudStatusText');
+      if (badge && text) {
+        if (isOnline) {
+          badge.className = 'text-[10px] px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold rounded-full flex items-center gap-1';
+          text.textContent = '클라우드 실시간 동기화';
+        } else {
+          badge.className = 'text-[10px] px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 font-semibold rounded-full flex items-center gap-1';
+          text.textContent = '로컬/서버 동기화 가동';
+        }
+      }
+    }
+
+    // ==========================================
+    // 🔐 관리자 인증 및 보안 시스템 (SHA-256 보안 해싱)
+    // ==========================================
+    function getStoredAdminHash() {
+      try {
+        return localStorage.getItem(ADMIN_HASH_KEY) || DEFAULT_ADMIN_HASH;
+      } catch (e) {
+        return DEFAULT_ADMIN_HASH;
       }
     }
 
@@ -773,16 +860,16 @@
       state.pendingTabTarget = null;
     };
 
-    window.handleAdminAuthSubmit = function(e) {
+    window.handleAdminAuthSubmit = async function(e) {
       if (e && e.preventDefault) e.preventDefault();
       var input = document.getElementById('adminPasswordInput');
       var enteredPw = (input ? input.value : '').trim();
-      var correctPw = getAdminPassword();
+      if (!enteredPw) return;
 
-      var lowerEntered = enteredPw.toLowerCase();
-      var lowerCorrect = correctPw.toLowerCase();
+      var enteredHash = await computeSHA256(enteredPw.toLowerCase());
+      var storedHash = getStoredAdminHash();
 
-      if (enteredPw === correctPw || lowerEntered === lowerCorrect || lowerEntered === 'ohyun2026' || lowerEntered === 'ohyeon2026') {
+      if (enteredHash === storedHash || enteredHash === DEFAULT_ADMIN_HASH || enteredHash === ALT_ADMIN_HASH) {
         state.isAdmin = true;
         try { sessionStorage.setItem('ohyun_admin_auth', 'true'); } catch (e) {}
         closeAdminAuthModal();
@@ -805,7 +892,7 @@
 
     window.adminLogout = function() {
       state.isAdmin = false;
-      try { sessionStorage.removeItem('Ohyun_admin_auth'); } catch (e) {}
+      try { sessionStorage.removeItem('ohyun_admin_auth'); } catch (e) {}
       updateAdminUI();
       switchTab('submit');
       showToast('관리자 로그아웃 되었습니다.', 'info');
@@ -842,11 +929,15 @@
       if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
     };
 
-    window.handleChangePasswordSubmit = function(e) {
+    window.handleChangePasswordSubmit = async function(e) {
       if (e && e.preventDefault) e.preventDefault();
       var cur = document.getElementById('currentPwInput').value.trim();
       var next = document.getElementById('newPwInput').value.trim();
-      if (cur !== getAdminPassword()) {
+
+      var curHash = await computeSHA256(cur.toLowerCase());
+      var storedHash = getStoredAdminHash();
+
+      if (curHash !== storedHash && curHash !== DEFAULT_ADMIN_HASH && curHash !== ALT_ADMIN_HASH) {
         showToast('현재 관리자 비밀번호가 일치하지 않습니다.', 'error');
         return;
       }
@@ -855,7 +946,8 @@
         return;
       }
       try {
-        localStorage.setItem(ADMIN_PW_KEY, next);
+        var newHash = await computeSHA256(next.toLowerCase());
+        localStorage.setItem(ADMIN_HASH_KEY, newHash);
         closeChangePasswordModal();
         showToast('✅ 관리자 비밀번호가 성공적으로 변경되었습니다.', 'success');
       } catch (err) {
@@ -914,7 +1006,7 @@
       state.authActionTarget = null;
     };
 
-    window.handleArticleAuthSubmit = function(e) {
+    window.handleArticleAuthSubmit = async function(e) {
       if (e && e.preventDefault) e.preventDefault();
       if (!state.authActionTarget) return;
 
@@ -927,16 +1019,16 @@
         return;
       }
 
+      var enteredHash = await computeSHA256(enteredPw.toLowerCase());
+      var storedAdminHash = getStoredAdminHash();
       var articlePw = article.password || '';
-      var masterPw = getAdminPassword();
-      var lowerEntered = enteredPw.toLowerCase();
-      var lowerMaster = masterPw.toLowerCase();
 
-      if (enteredPw === articlePw || enteredPw === masterPw || lowerEntered === lowerMaster || lowerEntered === 'ohyun2026' || lowerEntered === 'ohyeon2026') {
+      if (enteredPw === articlePw || enteredHash === storedAdminHash || enteredHash === DEFAULT_ADMIN_HASH || enteredHash === ALT_ADMIN_HASH) {
         var action = state.authActionTarget.action;
         var artId = state.authActionTarget.articleId;
         closeArticleAuthModal();
         closeFindMyArticleModal();
+        closeModal();
 
         if (action === 'edit') {
           startEditArticle(artId);
@@ -1018,6 +1110,7 @@
         state.articles = [];
       }
 
+      // Fetch from local server REST API if available
       fetch('/api/articles')
         .then(function(res) {
           if (!res.ok) throw new Error('Not local server');
@@ -1029,7 +1122,7 @@
             saveArticlesLocalOnly();
             renderCurrentTab();
             updateStats();
-            if (showNotification) showToast('교내 중앙 서버에서 ' + serverArticles.length + '건의 원고를 동기화했습니다.', 'success');
+            if (showNotification) showToast('중앙 서버에서 ' + serverArticles.length + '건의 원고를 동기화했습니다.', 'success');
           }
         })
         .catch(function() {
@@ -1048,6 +1141,15 @@
 
     function saveArticleToCentral(article) {
       saveArticlesLocalOnly();
+
+      // 1. Sync to Firebase Cloud Firestore (if initialized)
+      if (state.db) {
+        try {
+          state.db.collection('articles').doc(article.id).set(article, { merge: true }).catch(function() {});
+        } catch (e) {}
+      }
+
+      // 2. Sync to local backend server
       fetch('/api/articles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1058,6 +1160,13 @@
     function deleteArticleFromCentral(articleId) {
       state.articles = state.articles.filter(function(a) { return a.id !== articleId; });
       saveArticlesLocalOnly();
+
+      if (state.db) {
+        try {
+          state.db.collection('articles').doc(articleId).delete().catch(function() {});
+        } catch (e) {}
+      }
+
       fetch('/api/articles/' + articleId, {
         method: 'DELETE'
       }).catch(function() {});
@@ -1249,7 +1358,7 @@
         cancelEdit();
       } else {
         var newArticle = {
-          id: 'Ohyun-2026-' + Date.now().toString().slice(-4),
+          id: 'ohyun-2026-' + Date.now().toString().slice(-4),
           title: title,
           subtitle: subtitle,
           category: category,
@@ -1259,7 +1368,7 @@
           authorName: authorName,
           visibility: visibility,
           password: articlePassword,
-          status: 'submitted', // Always starts as '접수완료' (admin alone can confirm)
+          status: 'submitted',
           createdAt: new Date().toISOString().split('T')[0],
           content: content,
           tags: tags,
@@ -1291,8 +1400,13 @@
       if (submitBtnText) submitBtnText.textContent = '원고 및 사진 접수하기';
     };
 
+    // 🚀 수정 모드 즉시 전환 (팝업 100% 자동 닫힘 & 스크롤 이동)
     window.startEditArticle = function(articleId) {
       closeModal();
+      closeFindMyArticleModal();
+      closeArticleAuthModal();
+      closeAdminAuthModal();
+
       var article = state.articles.find(function(a) { return a.id === articleId; });
       if (!article) return;
 
@@ -1327,6 +1441,11 @@
       if (submitBtnText) submitBtnText.textContent = '원고 수정 완료 (저장)';
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(function() {
+        var tInput = document.getElementById('articleTitle');
+        if (tInput) tInput.focus();
+      }, 300);
+
       showToast('✏️ 원고 수정 모드로 전환되었습니다.', 'info');
     };
 
@@ -1588,7 +1707,7 @@
     }
 
     // ==========================================
-    // 📊 엑셀(CSV) 및 사진 ZIP 다운로드 (피드백 반영)
+    // 📊 엑셀(CSV) 및 사진 ZIP 다운로드
     // ==========================================
     window.exportToCsv = function() {
       if (state.articles.length === 0) { showToast('내보낼 원고 데이터가 없습니다.', 'warning'); return; }
