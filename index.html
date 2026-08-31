@@ -458,10 +458,20 @@
               <i data-lucide="images" class="w-4 h-4"></i>
               사진 일괄 다운로드 (ZIP)
             </button>
+            <!-- 외부 원고 가져오기 (파일 합치기) -->
+            <input type="file" id="importJsonInput" accept=".json" class="hidden" onchange="importFromJson(event)">
+            <button type="button" onclick="document.getElementById('importJsonInput').click()" title="다른 컴퓨터에서 저장된 백업 파일을 불러와 목록에 합칩니다" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow transition">
+              <i data-lucide="upload" class="w-4 h-4"></i>
+              원고 가져오기
+            </button>
             <!-- 데이터 백업 -->
             <button type="button" onclick="exportToJson()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow transition">
               <i data-lucide="download" class="w-4 h-4"></i>
               백업
+            </button>
+            <button type="button" onclick="openCloudConfigModal()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-bold flex items-center gap-1.5 transition" title="구글 파이어베이스 클라우드 DB 연동 설정">
+              <i data-lucide="cloud" class="w-4 h-4"></i>
+              클라우드 DB 설정
             </button>
             <button type="button" onclick="openChangePasswordModal()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
               <i data-lucide="key" class="w-4 h-4"></i>
@@ -647,8 +657,44 @@
           <input type="password" id="newPwInput" required class="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
         <div class="pt-2 flex gap-2">
-          <button type="button" onclick="closeChangePasswordModal()" class="w-1/2 py-2.5 rounded-xl border text-xs font-bold">취소</button>
-          <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-blue-600 text-white text-xs font-bold shadow">변경 저장</button>
+  <!-- ============================================== -->
+  <!-- 모달 4-2: 클라우드 DB 연동 설정 모달 -->
+  <!-- ============================================== -->
+  <div id="cloudConfigModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4" onclick="if(event.target===this) closeCloudConfigModal()">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-slate-200 fade-in">
+      <button type="button" onclick="closeCloudConfigModal()" class="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="mb-4">
+        <div class="flex items-center gap-2 text-blue-600 font-extrabold text-base mb-1">
+          <i data-lucide="cloud" class="w-6 h-6"></i>
+          <span>실시간 클라우드 DB 연동 설정</span>
+        </div>
+        <p class="text-xs text-slate-500">
+          모든 선생님들의 컴퓨터/스마트폰과 실시간으로 원고를 자동 동기화하기 위한 구글 파이어베이스(Firebase) 설정입니다.
+        </p>
+      </div>
+
+      <form onsubmit="handleCloudConfigSubmit(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Firebase Project ID (프로젝트 ID)</label>
+          <input type="text" id="firebaseProjectIdInput" placeholder="예: ohyun-magazine-2026" class="w-full px-3 py-2 border rounded-xl text-xs font-mono outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Firebase API Key (선택)</label>
+          <input type="text" id="firebaseApiKeyInput" placeholder="AIzaSy..." class="w-full px-3 py-2 border rounded-xl text-xs font-mono outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="p-3 bg-blue-50 text-blue-900 rounded-xl space-y-1">
+          <p class="font-bold">💡 클라우드 동기화 안내:</p>
+          <p class="text-[11px] leading-relaxed">
+            1. 구글 파이어베이스(무료)에서 프로젝트 생성 후 Project ID를 입력하시면 전 기기 실시간 동기화가 활성화됩니다.<br>
+            2. 설정이 없는 경우에도 <strong>[원고 가져오기/백업]</strong> 버튼으로 언제든 파일을 주고받을 수 있습니다.
+          </p>
+        </div>
+        <div class="pt-2 flex gap-2">
+          <button type="button" onclick="closeCloudConfigModal()" class="w-1/2 py-2.5 rounded-xl border font-bold">닫기</button>
+          <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-blue-600 text-white font-bold shadow">연동 저장</button>
         </div>
       </form>
     </div>
@@ -759,26 +805,30 @@
     // ==========================================
     // ☁️ Firebase Firestore 실시간 클라우드 DB 초기화
     // ==========================================
+    var FIREBASE_CONFIG = {
+      apiKey: "AIzaSyCCXrP2sP0Am-IXdoPcV_2AV9QeWcVCytc",
+      authDomain: "ohyun2026-1faea.firebaseapp.com",
+      projectId: "ohyun2026-1faea",
+      storageBucket: "ohyun2026-1faea.firebasestorage.app",
+      messagingSenderId: "224997362696",
+      appId: "1:224997362696:web:f987b6315345dc239595bd"
+    };
+
     function initCloudDB() {
       try {
         if (typeof firebase !== 'undefined') {
-          var firebaseConfig = {
-            apiKey: "AIzaSyD-OhyunMagazinePublicSync2026",
-            authDomain: "ohyun-magazine-2026.firebaseapp.com",
-            projectId: "ohyun-magazine-2026",
-            storageBucket: "ohyun-magazine-2026.appspot.com"
-          };
-
           if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+            firebase.initializeApp(FIREBASE_CONFIG);
           }
           state.db = firebase.firestore();
 
           // Realtime listener across all devices
-          state.db.collection('articles').onSnapshot(function(snapshot) {
+          state.db.collection('ohyun2026_articles').onSnapshot(function(snapshot) {
             var cloudArticles = [];
             snapshot.forEach(function(doc) {
-              cloudArticles.push(doc.data());
+              var data = doc.data();
+              data.id = doc.id;
+              cloudArticles.push(data);
             });
             if (cloudArticles.length > 0) {
               state.articles = cloudArticles.sort(function(a, b) {
@@ -790,10 +840,12 @@
               updateCloudStatus(true);
             }
           }, function(err) {
+            console.warn('Cloud sync error:', err);
             updateCloudStatus(false);
           });
         }
       } catch (e) {
+        console.warn('Firebase init error:', e);
         updateCloudStatus(false);
       }
     }
@@ -1145,7 +1197,9 @@
       // 1. Sync to Firebase Cloud Firestore (if initialized)
       if (state.db) {
         try {
-          state.db.collection('articles').doc(article.id).set(article, { merge: true }).catch(function() {});
+          state.db.collection('ohyun2026_articles').doc(article.id).set(article, { merge: true }).catch(function(err) {
+            console.warn('Firestore set error:', err);
+          });
         } catch (e) {}
       }
 
@@ -1163,7 +1217,7 @@
 
       if (state.db) {
         try {
-          state.db.collection('articles').doc(articleId).delete().catch(function() {});
+          state.db.collection('ohyun2026_articles').doc(articleId).delete().catch(function() {});
         } catch (e) {}
       }
 
@@ -1225,7 +1279,7 @@
 
     window.handleImageFiles = function(files) {
       var allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
-      var maxDim = 1400;
+      var maxDim = 1200;
       Array.from(files).forEach(function(file) {
         if (!allowed.includes(file.type)) {
           showToast(file.name + '은(는) 지원되지 않는 이미지 형식입니다.', 'error');
@@ -1245,7 +1299,7 @@
             canvas.getContext('2d').drawImage(img, 0, 0, w, h);
             var isCover = state.uploadedPhotos.length === 0;
             state.uploadedPhotos.push({
-              url: canvas.toDataURL('image/jpeg', 0.9),
+              url: canvas.toDataURL('image/jpeg', 0.8),
               caption: '',
               isCover: isCover,
               name: file.name
@@ -1796,6 +1850,71 @@
       link.click();
       document.body.removeChild(link);
       showToast('💾 JSON 백업 파일이 저장되었습니다.', 'success');
+    };
+
+    // 📥 외부 원고 파일 불러오기 및 합치기
+    window.importFromJson = function(event) {
+      var file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          var imported = JSON.parse(e.target.result);
+          if (!Array.isArray(imported)) {
+            if (imported.articles && Array.isArray(imported.articles)) imported = imported.articles;
+            else imported = [imported];
+          }
+
+          var addedCount = 0;
+          imported.forEach(function(newArt) {
+            if (!newArt.id) newArt.id = 'ohyun-2026-' + Date.now().toString().slice(-4);
+            var existingIdx = state.articles.findIndex(function(a) { return a.id === newArt.id; });
+            if (existingIdx === -1) {
+              state.articles.push(newArt);
+              addedCount++;
+            } else {
+              state.articles[existingIdx] = newArt;
+            }
+            saveArticleToCentral(newArt);
+          });
+
+          saveArticlesLocalOnly();
+          renderCurrentTab();
+          updateStats();
+          showToast('📥 총 ' + addedCount + '건의 신규 원고를 성공적으로 합쳤습니다!', 'success');
+        } catch (err) {
+          showToast('❌ JSON 파일을 읽는 도중 오류가 발생했습니다.', 'error');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    };
+
+    window.openCloudConfigModal = function() {
+      var modal = document.getElementById('cloudConfigModal');
+      var pIdInput = document.getElementById('firebaseProjectIdInput');
+      var apiKeyInput = document.getElementById('firebaseApiKeyInput');
+      if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+      if (pIdInput) pIdInput.value = localStorage.getItem('ohyun_fb_project_id') || '';
+      if (apiKeyInput) apiKeyInput.value = localStorage.getItem('ohyun_fb_api_key') || '';
+      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
+    };
+
+    window.closeCloudConfigModal = function() {
+      var modal = document.getElementById('cloudConfigModal');
+      if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+    };
+
+    window.handleCloudConfigSubmit = function(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      var pId = (document.getElementById('firebaseProjectIdInput').value || '').trim();
+      var apiKey = (document.getElementById('firebaseApiKeyInput').value || '').trim();
+      if (pId) localStorage.setItem('ohyun_fb_project_id', pId);
+      if (apiKey) localStorage.setItem('ohyun_fb_api_key', apiKey);
+      closeCloudConfigModal();
+      showToast('☁️ 클라우드 DB 연동 정보가 저장되었습니다. 페이지를 새로고침하면 적용됩니다.', 'success');
+      setTimeout(function() { window.location.reload(); }, 1200);
     };
 
     function showToast(message, type) {
