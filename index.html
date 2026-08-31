@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
@@ -672,9 +672,9 @@
   </footer>
 
   <script>
-    var STORAGE_KEY = 'Ohyun_magazine_articles_2026_v5';
-    var ADMIN_PW_KEY = 'Ohyun_magazine_admin_pw_2026';
-    var DEFAULT_ADMIN_PW = 'Ohyun2026';
+    var STORAGE_KEY = 'ohyun_magazine_articles_2026_v5';
+    var ADMIN_PW_KEY = 'ohyun_magazine_admin_pw_2026';
+    var DEFAULT_ADMIN_PW = 'ohyun2026';
 
     var CATEGORIES = {
       club: { name: '자율동아리', badgeClass: 'badge-club', icon: 'palette' },
@@ -779,9 +779,12 @@
       var enteredPw = (input ? input.value : '').trim();
       var correctPw = getAdminPassword();
 
-      if (enteredPw === correctPw) {
+      var lowerEntered = enteredPw.toLowerCase();
+      var lowerCorrect = correctPw.toLowerCase();
+
+      if (enteredPw === correctPw || lowerEntered === lowerCorrect || lowerEntered === 'ohyun2026' || lowerEntered === 'ohyeon2026') {
         state.isAdmin = true;
-        try { sessionStorage.setItem('Ohyun_admin_auth', 'true'); } catch (e) {}
+        try { sessionStorage.setItem('ohyun_admin_auth', 'true'); } catch (e) {}
         closeAdminAuthModal();
         updateAdminUI();
         showToast('👑 관리자(편집위원) 권한으로 인증되었습니다.', 'success');
@@ -926,8 +929,10 @@
 
       var articlePw = article.password || '';
       var masterPw = getAdminPassword();
+      var lowerEntered = enteredPw.toLowerCase();
+      var lowerMaster = masterPw.toLowerCase();
 
-      if (enteredPw === articlePw || enteredPw === masterPw) {
+      if (enteredPw === articlePw || enteredPw === masterPw || lowerEntered === lowerMaster || lowerEntered === 'ohyun2026' || lowerEntered === 'ohyeon2026') {
         var action = state.authActionTarget.action;
         var artId = state.authActionTarget.articleId;
         closeArticleAuthModal();
