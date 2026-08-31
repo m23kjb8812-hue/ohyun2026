@@ -39,6 +39,14 @@
       border-color: #2563eb !important;
       background-color: #eff6ff !important;
     }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+    .shake-animate {
+      animation: shake 0.4s ease-in-out;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-800 flex flex-col justify-between">
@@ -62,21 +70,32 @@
           </div>
         </div>
 
-        <!-- 탭 네비게이션 버튼 -->
-        <nav class="flex items-center gap-1.5 sm:gap-2">
-          <button type="button" onclick="switchTab('submit')" data-tab="submit" class="tab-btn px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-blue-600 text-white shadow-sm">
-            <i data-lucide="edit-3" class="w-4 h-4"></i>
-            <span>원고 등록</span>
-          </button>
-          <button type="button" onclick="switchTab('gallery')" data-tab="gallery" class="tab-btn px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-            <i data-lucide="grid" class="w-4 h-4"></i>
-            <span>접수 현황 (모아보기)</span>
-          </button>
-          <button type="button" onclick="switchTab('admin')" data-tab="admin" class="tab-btn px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-            <i data-lucide="settings" class="w-4 h-4"></i>
-            <span>편집 관리 (엑셀)</span>
-          </button>
-        </nav>
+        <!-- 탭 네비게이션 버튼 & 관리자 상태 -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <!-- 관리자 로그인 뱃지 -->
+          <div id="adminStatusBadge" class="hidden items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-full text-xs font-bold shadow-sm">
+            <i data-lucide="crown" class="w-3.5 h-3.5 text-amber-600"></i>
+            <span>편집위원 모드</span>
+            <button type="button" onclick="adminLogout()" title="관리자 로그아웃" class="ml-1 text-slate-500 hover:text-rose-600 font-normal">
+              [로그아웃]
+            </button>
+          </div>
+
+          <nav class="flex items-center gap-1.5 sm:gap-2">
+            <button type="button" onclick="switchTab('submit')" data-tab="submit" class="tab-btn px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-blue-600 text-white shadow-sm">
+              <i data-lucide="edit-3" class="w-4 h-4"></i>
+              <span>원고 등록</span>
+            </button>
+            <button type="button" onclick="requestTabAccess('gallery')" data-tab="gallery" class="tab-btn px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+              <i id="galleryLockIcon" data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i>
+              <span>접수 현황</span>
+            </button>
+            <button type="button" onclick="requestTabAccess('admin')" data-tab="admin" class="tab-btn px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+              <i id="adminLockIcon" data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i>
+              <span>편집 관리 (엑셀)</span>
+            </button>
+          </nav>
+        </div>
       </div>
     </div>
   </header>
@@ -139,16 +158,25 @@
           </button>
         </div>
 
-        <div class="border-b border-slate-100 pb-6 mb-8">
-          <h2 class="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2.5">
-            <span class="p-2 rounded-xl bg-blue-50 text-blue-600">
-              <i data-lucide="pen-tool" class="w-6 h-6"></i>
-            </span>
-            교지(소식지) 원고 기입 및 사진 첨부
-          </h2>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1 pl-11">
-            오현중학교 교지에 수록될 프로그램/동아리 제목, 사진, 활동 내용을 입력해주세요.
-          </p>
+        <!-- 폼 상단 헤더 & [내 원고 찾아 수정하기] 버튼 -->
+        <div class="border-b border-slate-100 pb-6 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2.5">
+              <span class="p-2 rounded-xl bg-blue-50 text-blue-600">
+                <i data-lucide="pen-tool" class="w-6 h-6"></i>
+              </span>
+              교지(소식지) 원고 기입 및 사진 첨부
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1 pl-11">
+              선생님께서 담당하신 자율동아리나 교육활동의 제목, 사진, 활동 내용을 입력해 주세요.
+            </p>
+          </div>
+
+          <!-- 기제출 원고 검색/수정 버튼 -->
+          <button type="button" onclick="openFindMyArticleModal()" class="shrink-0 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-300 hover:border-blue-300 text-xs font-bold flex items-center gap-1.5 transition">
+            <i data-lucide="search" class="w-4 h-4"></i>
+            <span>기존 등록 원고 수정하기</span>
+          </button>
         </div>
 
         <form id="magazineSubmitForm" onsubmit="handleFormSubmit(event)" class="space-y-8">
@@ -276,18 +304,31 @@
             </div>
           </div>
 
-          <!-- 4단계: 작성자 정보 -->
+          <!-- 4단계: 작성자 정보 및 수정용 비밀번호 (신규 추가) -->
           <div class="space-y-4 pt-4 border-t border-slate-100">
             <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2 border-l-4 border-blue-600 pl-2.5">
-              4. 작성자 정보
+              4. 작성자 정보 및 수정 보안 비밀번호
             </h3>
             
-            <div>
-              <label for="authorName" class="block text-xs font-bold text-slate-700 mb-1">
-                작성자 성명 (교사명)
-              </label>
-              <input type="text" id="authorName" placeholder="예: 홍길동 선생님 또는 담당 교사 성명"
-                class="w-full sm:w-80 px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- 작성자 성명 -->
+              <div>
+                <label for="authorName" class="block text-xs font-bold text-slate-700 mb-1">
+                  작성자 성명 (교사명) <span class="text-rose-500">* (필수)</span>
+                </label>
+                <input type="text" id="authorName" required placeholder="예: 홍길동 선생님 또는 담당 교사 성명"
+                  class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+              </div>
+
+              <!-- 원고 수정/삭제용 비밀번호 -->
+              <div>
+                <label for="articlePassword" class="block text-xs font-bold text-slate-700 mb-1">
+                  원고 수정/삭제용 비밀번호 <span class="text-rose-500">* (필수)</span>
+                </label>
+                <input type="password" id="articlePassword" required placeholder="4자리 이상 (예: 1234)"
+                  class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-mono">
+                <span class="text-[11px] text-slate-400 mt-1 block">추후 다른 선생님이나 본인이 원고를 수정할 때 사용할 비밀번호입니다.</span>
+              </div>
             </div>
           </div>
 
@@ -306,7 +347,7 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- 탭 2: 접수 현황 모아보기 (Gallery Tab) -->
+    <!-- 탭 2: 접수 현황 모아보기 (Gallery Tab - 관리자 전용) -->
     <!-- ============================================== -->
     <div id="tab-gallery" class="tab-pane hidden">
       <div class="space-y-6">
@@ -335,12 +376,17 @@
             </button>
           </div>
 
-          <!-- 검색창 -->
-          <div class="relative w-full md:w-72">
-            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-            <input type="text" id="gallerySearch" placeholder="원고 제목, 내용, 작성자 검색..."
-              oninput="state.searchQuery = this.value.trim().toLowerCase(); renderGallery();"
-              class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 focus:bg-white transition">
+          <!-- 검색창 & 새로고침 -->
+          <div class="flex items-center gap-2 w-full md:w-auto">
+            <div class="relative w-full md:w-64">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="gallerySearch" placeholder="제목, 내용, 교사명 검색..."
+                oninput="state.searchQuery = this.value.trim().toLowerCase(); renderGallery();"
+                class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 focus:bg-white transition">
+            </div>
+            <button type="button" onclick="loadAllArticles(true)" title="원고 최신 목록 불러오기" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
           </div>
         </div>
 
@@ -358,7 +404,7 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- 탭 3: 편집위원회 관리 대시보드 (Admin Tab) -->
+    <!-- 탭 3: 편집위원회 관리 대시보드 (Admin Tab - 관리자 전용) -->
     <!-- ============================================== -->
     <div id="tab-admin" class="tab-pane hidden">
       <div class="space-y-6">
@@ -366,12 +412,15 @@
         <!-- 관리 툴바 -->
         <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
-            <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
-              <i data-lucide="shield-check" class="w-5 h-5 text-blue-600"></i>
-              교지 편집위원회 원고 관리 센터
-            </h3>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <i data-lucide="shield-check" class="w-5 h-5 text-blue-600"></i>
+                교지 편집위원회 원고 관리 센터
+              </h3>
+              <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[11px] font-bold rounded-full">인증 완료</span>
+            </div>
             <p class="text-xs text-slate-500 mt-0.5">
-              접수된 원고를 검토하고 수록 여부를 지정하거나 엑셀(CSV) 파일로 일괄 내려받습니다.
+              선생님들이 접수하신 전체 원고를 검토하고 수록 여부를 지정하거나 엑셀(CSV)로 일괄 내려받습니다.
             </p>
           </div>
 
@@ -384,11 +433,10 @@
               <i data-lucide="download" class="w-4 h-4"></i>
               데이터 백업
             </button>
-            <label class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer transition">
-              <i data-lucide="upload" class="w-4 h-4"></i>
-              백업 복구
-              <input type="file" accept=".json" onchange="importFromJson(event)" class="hidden">
-            </label>
+            <button type="button" onclick="openChangePasswordModal()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
+              <i data-lucide="key" class="w-4 h-4"></i>
+              관리자 암호 변경
+            </button>
           </div>
         </div>
 
@@ -416,7 +464,162 @@
 
   </main>
 
-  <!-- 상세 보기 & 수정/삭제 모달 -->
+  <!-- ============================================== -->
+  <!-- 모달 1: 관리자 마스터 비밀번호 인증 모달 -->
+  <!-- ============================================== -->
+  <div id="adminAuthModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4" onclick="if(event.target===this) closeAdminAuthModal()">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative border border-slate-200 fade-in">
+      <button type="button" onclick="closeAdminAuthModal()" class="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-14 h-14 mx-auto rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center mb-3 shadow-inner">
+          <i data-lucide="lock" class="w-7 h-7"></i>
+        </div>
+        <h3 class="text-lg font-black text-slate-900">교지 편집위원회 관리자 인증</h3>
+        <p class="text-xs text-slate-500 mt-1">
+          접수 현황 및 편집 관리 기능은 오현중학교 교지 편집위원(관리자) 전용 메뉴입니다.
+        </p>
+      </div>
+
+      <form id="adminAuthForm" onsubmit="handleAdminAuthSubmit(event)" class="space-y-4">
+        <div>
+          <label for="adminPasswordInput" class="block text-xs font-bold text-slate-700 mb-1.5">
+            관리자 비밀번호
+          </label>
+          <input type="password" id="adminPasswordInput" required placeholder="비밀번호 입력"
+            class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none text-center tracking-widest font-mono bg-slate-50 focus:bg-white transition">
+        </div>
+
+        <div class="flex items-center justify-between text-xs text-slate-400 px-1">
+          <span>기본 비밀번호: <strong class="text-slate-600">ohyeon2026</strong></span>
+        </div>
+
+        <div class="pt-2 flex items-center gap-2">
+          <button type="button" onclick="closeAdminAuthModal()" class="w-1/2 py-3 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-100 text-xs sm:text-sm font-bold transition">
+            취소
+          </button>
+          <button type="submit" class="w-1/2 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-lg shadow-blue-600/30 transition flex items-center justify-center gap-1.5">
+            <i data-lucide="key" class="w-4 h-4"></i>
+            <span>인증 확인</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 모달 2: 개별 원고 수정 비밀번호 확인 모달 -->
+  <!-- ============================================== -->
+  <div id="articleAuthModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4" onclick="if(event.target===this) closeArticleAuthModal()">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative border border-slate-200 fade-in">
+      <button type="button" onclick="closeArticleAuthModal()" class="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mb-3">
+          <i data-lucide="shield-alert" class="w-7 h-7"></i>
+        </div>
+        <h3 class="text-lg font-black text-slate-900">원고 수정 / 삭제 보안 인증</h3>
+        <p class="text-xs text-slate-500 mt-1">
+          '<span id="authTargetTitleText" class="font-bold text-blue-700"></span>' 원고를 등록할 때 설정하신 비밀번호를 입력해주세요.
+        </p>
+      </div>
+
+      <form id="articleAuthForm" onsubmit="handleArticleAuthSubmit(event)" class="space-y-4">
+        <div>
+          <label for="articlePasswordInput" class="block text-xs font-bold text-slate-700 mb-1.5">
+            원고 등록 비밀번호
+          </label>
+          <input type="password" id="articlePasswordInput" required placeholder="등록 시 설정한 4자리 비밀번호"
+            class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none text-center tracking-widest font-mono bg-slate-50 focus:bg-white transition">
+        </div>
+
+        <div class="pt-2 flex items-center gap-2">
+          <button type="button" onclick="closeArticleAuthModal()" class="w-1/2 py-3 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-100 text-xs sm:text-sm font-bold transition">
+            취소
+          </button>
+          <button type="submit" class="w-1/2 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-lg shadow-blue-600/30 transition flex items-center justify-center gap-1.5">
+            <i data-lucide="check-circle" class="w-4 h-4"></i>
+            <span>확인 후 진행</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 모달 3: 내 원고 찾아 수정하기 모달 -->
+  <!-- ============================================== -->
+  <div id="findMyArticleModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4" onclick="if(event.target===this) closeFindMyArticleModal()">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-slate-200 fade-in">
+      <button type="button" onclick="closeFindMyArticleModal()" class="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="mb-6">
+        <div class="flex items-center gap-2 text-blue-600 font-extrabold text-base mb-1">
+          <i data-lucide="file-search" class="w-5 h-5"></i>
+          <span>등록된 내 원고 조회 및 수정</span>
+        </div>
+        <p class="text-xs text-slate-500">
+          이전에 등록하신 원고를 수정하시려면 작성자 성명 또는 프로그램명을 검색해주세요.
+        </p>
+      </div>
+
+      <div class="space-y-4">
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input type="text" id="findArticleSearchInput" placeholder="작성자(선생님 성명) 또는 프로그램명 검색..."
+            oninput="renderFindArticleResults(this.value)"
+            class="w-full pl-9 pr-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 focus:bg-white transition">
+        </div>
+
+        <!-- 검색 결과 리스트 -->
+        <div id="findArticleResultsList" class="max-h-60 overflow-y-auto space-y-2 divide-y divide-slate-100 pr-1"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 모달 4: 관리자 마스터 비밀번호 변경 모달 -->
+  <!-- ============================================== -->
+  <div id="changePwModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4" onclick="if(event.target===this) closeChangePasswordModal()">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative border border-slate-200 fade-in">
+      <button type="button" onclick="closeChangePasswordModal()" class="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 mx-auto rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mb-3">
+          <i data-lucide="key" class="w-6 h-6"></i>
+        </div>
+        <h3 class="text-lg font-black text-slate-900">관리자 비밀번호 변경</h3>
+        <p class="text-xs text-slate-500 mt-1">새로운 편집위원회 관리자 마스터 비밀번호를 설정합니다.</p>
+      </div>
+
+      <form onsubmit="handleChangePasswordSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">현재 비밀번호</label>
+          <input type="password" id="currentPwInput" required class="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">새 비밀번호</label>
+          <input type="password" id="newPwInput" required class="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div class="pt-2 flex gap-2">
+          <button type="button" onclick="closeChangePasswordModal()" class="w-1/2 py-2.5 rounded-xl border text-xs font-bold">취소</button>
+          <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-blue-600 text-white text-xs font-bold shadow">변경 저장</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 모달 5: 상세 보기 모달 -->
+  <!-- ============================================== -->
   <div id="articleModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto" onclick="if(event.target===this) closeModal()">
     <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative">
       <button type="button" id="closeModalBtn" onclick="closeModal()" class="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition z-10">
@@ -441,7 +644,9 @@
   </footer>
 
   <script>
-    var STORAGE_KEY = 'ohyeon_magazine_articles_2026_v2';
+    var STORAGE_KEY = 'ohyeon_magazine_articles_2026_v4';
+    var ADMIN_PW_KEY = 'ohyeon_magazine_admin_pw_2026';
+    var DEFAULT_ADMIN_PW = 'ohyeon2026';
 
     var CATEGORIES = {
       club: { name: '자율동아리', badgeClass: 'badge-club', icon: 'palette' },
@@ -465,16 +670,22 @@
       searchQuery: '',
       uploadedPhotos: [],
       selectedArticleForModal: null,
-      editingArticleId: null
+      editingArticleId: null,
+      isAdmin: false,
+      pendingTabTarget: null,
+      authActionTarget: null // { articleId: '...', action: 'edit' | 'delete' }
     };
 
     function initApp() {
+      // Check admin session
       try {
-        if (localStorage.getItem('ohyeon_magazine_articles_2026')) {
-          localStorage.removeItem('ohyeon_magazine_articles_2026');
+        if (sessionStorage.getItem('ohyeon_admin_auth') === 'true') {
+          state.isAdmin = true;
         }
       } catch (e) {}
-      loadArticles();
+
+      updateAdminUI();
+      loadAllArticles();
       initDropZone();
       renderCurrentTab();
       updateStats();
@@ -487,29 +698,342 @@
       initApp();
     }
 
-    function loadArticles() {
+    // ==========================================
+    // 🔐 관리자 인증 및 보안 시스템
+    // ==========================================
+    function getAdminPassword() {
+      try {
+        return localStorage.getItem(ADMIN_PW_KEY) || DEFAULT_ADMIN_PW;
+      } catch (e) {
+        return DEFAULT_ADMIN_PW;
+      }
+    }
+
+    window.requestTabAccess = function(tabName) {
+      if (tabName === 'submit') {
+        switchTab('submit');
+        return;
+      }
+
+      if (state.isAdmin) {
+        switchTab(tabName);
+      } else {
+        state.pendingTabTarget = tabName;
+        openAdminAuthModal();
+      }
+    };
+
+    function openAdminAuthModal() {
+      var modal = document.getElementById('adminAuthModal');
+      var input = document.getElementById('adminPasswordInput');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+      if (input) {
+        input.value = '';
+        setTimeout(function() { input.focus(); }, 100);
+      }
+      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
+    }
+
+    window.closeAdminAuthModal = function() {
+      var modal = document.getElementById('adminAuthModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+      state.pendingTabTarget = null;
+    };
+
+    window.handleAdminAuthSubmit = function(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      var input = document.getElementById('adminPasswordInput');
+      var enteredPw = (input ? input.value : '').trim();
+      var correctPw = getAdminPassword();
+
+      if (enteredPw === correctPw) {
+        state.isAdmin = true;
+        try { sessionStorage.setItem('ohyeon_admin_auth', 'true'); } catch (e) {}
+        closeAdminAuthModal();
+        updateAdminUI();
+        showToast('👑 관리자(편집위원) 권한으로 인증되었습니다.', 'success');
+        
+        var target = state.pendingTabTarget || 'gallery';
+        state.pendingTabTarget = null;
+        switchTab(target);
+      } else {
+        var form = document.getElementById('adminAuthForm');
+        if (form) {
+          form.classList.add('shake-animate');
+          setTimeout(function() { form.classList.remove('shake-animate'); }, 500);
+        }
+        showToast('❌ 관리자 비밀번호가 일치하지 않습니다.', 'error');
+        if (input) { input.value = ''; input.focus(); }
+      }
+    };
+
+    window.adminLogout = function() {
+      state.isAdmin = false;
+      try { sessionStorage.removeItem('ohyeon_admin_auth'); } catch (e) {}
+      updateAdminUI();
+      switchTab('submit');
+      showToast('관리자 로그아웃 되었습니다.', 'info');
+    };
+
+    function updateAdminUI() {
+      var statusBadge = document.getElementById('adminStatusBadge');
+      var galleryLock = document.getElementById('galleryLockIcon');
+      var adminLock = document.getElementById('adminLockIcon');
+
+      if (state.isAdmin) {
+        if (statusBadge) { statusBadge.classList.remove('hidden'); statusBadge.classList.add('inline-flex'); }
+        if (galleryLock) { galleryLock.setAttribute('data-lucide', 'unlock'); galleryLock.className = 'w-3.5 h-3.5 text-emerald-600'; }
+        if (adminLock) { adminLock.setAttribute('data-lucide', 'unlock'); adminLock.className = 'w-3.5 h-3.5 text-emerald-600'; }
+      } else {
+        if (statusBadge) { statusBadge.classList.add('hidden'); statusBadge.classList.remove('inline-flex'); }
+        if (galleryLock) { galleryLock.setAttribute('data-lucide', 'lock'); galleryLock.className = 'w-3.5 h-3.5 text-slate-400'; }
+        if (adminLock) { adminLock.setAttribute('data-lucide', 'lock'); adminLock.className = 'w-3.5 h-3.5 text-slate-400'; }
+      }
+      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
+    }
+
+    window.openChangePasswordModal = function() {
+      var modal = document.getElementById('changePwModal');
+      if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
+    };
+
+    window.closeChangePasswordModal = function() {
+      var modal = document.getElementById('changePwModal');
+      if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+    };
+
+    window.handleChangePasswordSubmit = function(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      var cur = document.getElementById('currentPwInput').value.trim();
+      var next = document.getElementById('newPwInput').value.trim();
+      if (cur !== getAdminPassword()) {
+        showToast('현재 관리자 비밀번호가 일치하지 않습니다.', 'error');
+        return;
+      }
+      if (!next || next.length < 4) {
+        showToast('새 비밀번호는 4자리 이상이어야 합니다.', 'warning');
+        return;
+      }
+      try {
+        localStorage.setItem(ADMIN_PW_KEY, next);
+        closeChangePasswordModal();
+        showToast('✅ 관리자 비밀번호가 성공적으로 변경되었습니다.', 'success');
+      } catch (err) {
+        showToast('비밀번호 저장 중 오류가 발생했습니다.', 'error');
+      }
+    };
+
+    // ==========================================
+    // 🔒 개별 원고 수정/삭제 비밀번호 검증 시스템
+    // ==========================================
+    window.verifyAndEditArticle = function(articleId) {
+      var article = state.articles.find(function(a) { return a.id === articleId; });
+      if (!article) return;
+
+      // Master admin bypass
+      if (state.isAdmin) {
+        startEditArticle(articleId);
+        return;
+      }
+
+      state.authActionTarget = { articleId: articleId, action: 'edit' };
+      openArticleAuthModal(article.title);
+    };
+
+    window.verifyAndDeleteArticle = function(articleId) {
+      var article = state.articles.find(function(a) { return a.id === articleId; });
+      if (!article) return;
+
+      // Master admin bypass
+      if (state.isAdmin) {
+        deleteArticle(articleId);
+        return;
+      }
+
+      state.authActionTarget = { articleId: articleId, action: 'delete' };
+      openArticleAuthModal(article.title);
+    };
+
+    function openArticleAuthModal(title) {
+      var modal = document.getElementById('articleAuthModal');
+      var titleText = document.getElementById('authTargetTitleText');
+      var input = document.getElementById('articlePasswordInput');
+      if (titleText) titleText.textContent = title;
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+      if (input) {
+        input.value = '';
+        setTimeout(function() { input.focus(); }, 100);
+      }
+      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
+    }
+
+    window.closeArticleAuthModal = function() {
+      var modal = document.getElementById('articleAuthModal');
+      if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+      state.authActionTarget = null;
+    };
+
+    window.handleArticleAuthSubmit = function(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      if (!state.authActionTarget) return;
+
+      var input = document.getElementById('articlePasswordInput');
+      var enteredPw = (input ? input.value : '').trim();
+      var article = state.articles.find(function(a) { return a.id === state.authActionTarget.articleId; });
+
+      if (!article) {
+        closeArticleAuthModal();
+        return;
+      }
+
+      // Check if password matches article password OR master admin password
+      var articlePw = article.password || '';
+      var masterPw = getAdminPassword();
+
+      if (enteredPw === articlePw || enteredPw === masterPw) {
+        var action = state.authActionTarget.action;
+        var artId = state.authActionTarget.articleId;
+        closeArticleAuthModal();
+        closeFindMyArticleModal();
+
+        if (action === 'edit') {
+          startEditArticle(artId);
+        } else if (action === 'delete') {
+          deleteArticle(artId);
+        }
+      } else {
+        var form = document.getElementById('articleAuthForm');
+        if (form) {
+          form.classList.add('shake-animate');
+          setTimeout(function() { form.classList.remove('shake-animate'); }, 500);
+        }
+        showToast('❌ 원고 비밀번호가 일치하지 않습니다.', 'error');
+        if (input) { input.value = ''; input.focus(); }
+      }
+    };
+
+    // ==========================================
+    // 🔍 [내 원고 찾아 수정하기] 모달
+    // ==========================================
+    window.openFindMyArticleModal = function() {
+      var modal = document.getElementById('findMyArticleModal');
+      var input = document.getElementById('findArticleSearchInput');
+      if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+      if (input) { input.value = ''; }
+      renderFindArticleResults('');
+      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
+    };
+
+    window.closeFindMyArticleModal = function() {
+      var modal = document.getElementById('findMyArticleModal');
+      if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+    };
+
+    window.renderFindArticleResults = function(query) {
+      var container = document.getElementById('findArticleResultsList');
+      if (!container) return;
+
+      var q = (query || '').trim().toLowerCase();
+      var filtered = state.articles;
+
+      if (q) {
+        filtered = filtered.filter(function(a) {
+          return a.title.toLowerCase().includes(q) ||
+            a.authorName.toLowerCase().includes(q) ||
+            (a.subtitle && a.subtitle.toLowerCase().includes(q));
+        });
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="py-6 text-center text-xs text-slate-400">일치하는 등록 원고가 없습니다.</div>';
+        return;
+      }
+
+      var html = '';
+      filtered.forEach(function(article) {
+        var cat = CATEGORIES[article.category] || { name: '기타' };
+        html += '<div class="p-3 bg-slate-50 hover:bg-blue-50/50 rounded-xl border border-slate-200 transition flex items-center justify-between gap-3">';
+        html += '<div class="min-w-0">';
+        html += '<div class="flex items-center gap-1.5 mb-0.5"><span class="text-[10px] px-1.5 py-0.5 bg-slate-200 text-slate-700 font-bold rounded">' + cat.name + '</span><span class="text-xs font-bold text-slate-900 truncate">' + escapeHtml(article.title) + '</span></div>';
+        html += '<div class="text-[11px] text-slate-400">작성자: ' + escapeHtml(article.authorName) + ' · 접수일: ' + article.createdAt + '</div>';
+        html += '</div>';
+        html += '<button type="button" onclick="verifyAndEditArticle(\'' + article.id + '\')" class="shrink-0 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-1"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i> 수정</button>';
+        html += '</div>';
+      });
+
+      container.innerHTML = html;
+      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
+    };
+
+    // ==========================================
+    // 🌐 중앙 데이터베이스 연동
+    // ==========================================
+    function loadAllArticles(showNotification) {
       try {
         var saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          state.articles = JSON.parse(saved);
-        } else {
-          state.articles = [];
-          saveArticles();
-        }
+        if (saved) state.articles = JSON.parse(saved);
       } catch (e) {
         state.articles = [];
       }
-    }
 
-    function saveArticles() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.articles));
-      } catch (e) {
-        showToast('저장 공간 초과 오류가 발생했습니다. 사진 크기를 줄여주세요.', 'error');
-      }
+      fetch('/api/articles')
+        .then(function(res) {
+          if (!res.ok) throw new Error('Not local server');
+          return res.json();
+        })
+        .then(function(serverArticles) {
+          if (Array.isArray(serverArticles) && serverArticles.length > 0) {
+            state.articles = serverArticles;
+            saveArticlesLocalOnly();
+            renderCurrentTab();
+            updateStats();
+            if (showNotification) showToast('교내 중앙 서버에서 ' + serverArticles.length + '건의 원고를 동기화했습니다.', 'success');
+          }
+        })
+        .catch(function() {
+          if (showNotification) showToast('최신 원고 목록을 불러왔습니다. (총 ' + state.articles.length + '건)', 'info');
+        });
+
+      renderCurrentTab();
       updateStats();
     }
 
+    function saveArticlesLocalOnly() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.articles));
+      } catch (e) {}
+    }
+
+    function saveArticleToCentral(article) {
+      saveArticlesLocalOnly();
+      fetch('/api/articles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(article)
+      }).catch(function() {});
+    }
+
+    function deleteArticleFromCentral(articleId) {
+      state.articles = state.articles.filter(function(a) { return a.id !== articleId; });
+      saveArticlesLocalOnly();
+      fetch('/api/articles/' + articleId, {
+        method: 'DELETE'
+      }).catch(function() {});
+    }
+
+    // ==========================================
+    // 📂 드롭존 및 이미지 업로드
+    // ==========================================
     function initDropZone() {
       var dropZone = document.getElementById('photoDropZone');
       if (dropZone) {
@@ -640,6 +1164,9 @@
       }
     };
 
+    // ==========================================
+    // 📝 원고 등록 & 수정 폼 제출
+    // ==========================================
     window.handleFormSubmit = function(e) {
       if (e && e.preventDefault) e.preventDefault();
       var title = document.getElementById('articleTitle').value.trim();
@@ -648,12 +1175,15 @@
       var date = document.getElementById('articleDate').value.trim();
       var targetGrade = document.getElementById('targetGrade').value.trim();
       var authorName = document.getElementById('authorName').value.trim();
+      var articlePassword = document.getElementById('articlePassword').value.trim();
       var content = document.getElementById('articleContent').value.trim();
       var tagsInput = document.getElementById('articleTags').value.trim();
 
       if (!title) { showToast('프로그램 또는 동아리 제목을 입력해주세요.', 'warning'); document.getElementById('articleTitle').focus(); return; }
       if (!category) { showToast('카테고리를 선택해주세요.', 'warning'); document.getElementById('articleCategory').focus(); return; }
       if (!content) { showToast('교지에 수록할 활동 내용을 작성해주세요.', 'warning'); document.getElementById('articleContent').focus(); return; }
+      if (!authorName) { showToast('작성자 성명(교사명)을 입력해주세요.', 'warning'); document.getElementById('authorName').focus(); return; }
+      if (!articlePassword || articlePassword.length < 4) { showToast('원고 수정용 비밀번호를 4자리 이상 입력해주세요.', 'warning'); document.getElementById('articlePassword').focus(); return; }
 
       var tags = tagsInput
         ? tagsInput.split(',').map(function(t) { return t.trim(); }).filter(function(t) { return t; }).map(function(t) { return t.startsWith('#') ? t : '#' + t; })
@@ -664,18 +1194,22 @@
       if (state.editingArticleId) {
         var existingIndex = state.articles.findIndex(function(a) { return a.id === state.editingArticleId; });
         if (existingIndex !== -1) {
-          state.articles[existingIndex].title = title;
-          state.articles[existingIndex].subtitle = subtitle;
-          state.articles[existingIndex].category = category;
-          state.articles[existingIndex].categoryName = CATEGORIES[category] ? CATEGORIES[category].name : '기타';
-          state.articles[existingIndex].date = date || '2026학년도 연중';
-          state.articles[existingIndex].targetGrade = targetGrade || '해당 학생';
-          state.articles[existingIndex].authorName = authorName || '선생님';
-          state.articles[existingIndex].content = content;
-          state.articles[existingIndex].tags = tags;
-          state.articles[existingIndex].photos = photos;
-          state.articles[existingIndex].updatedAt = new Date().toISOString().split('T')[0];
-          saveArticles();
+          var updated = Object.assign({}, state.articles[existingIndex], {
+            title: title,
+            subtitle: subtitle,
+            category: category,
+            categoryName: CATEGORIES[category] ? CATEGORIES[category].name : '기타',
+            date: date || '2026학년도 연중',
+            targetGrade: targetGrade || '해당 학생',
+            authorName: authorName,
+            password: articlePassword,
+            content: content,
+            tags: tags,
+            photos: photos,
+            updatedAt: new Date().toISOString().split('T')[0]
+          });
+          state.articles[existingIndex] = updated;
+          saveArticleToCentral(updated);
           showToast('✅ 원고가 성공적으로 수정되었습니다.', 'success');
         }
         cancelEdit();
@@ -688,7 +1222,8 @@
           categoryName: CATEGORIES[category] ? CATEGORIES[category].name : '기타',
           date: date || '2026학년도 연중',
           targetGrade: targetGrade || '해당 학생',
-          authorName: authorName || '선생님',
+          authorName: authorName,
+          password: articlePassword,
           status: 'submitted',
           createdAt: new Date().toISOString().split('T')[0],
           content: content,
@@ -697,12 +1232,15 @@
         };
 
         state.articles.unshift(newArticle);
-        saveArticles();
+        saveArticleToCentral(newArticle);
         resetForm();
-        showToast('🎉 원고와 사진이 성공적으로 접수되었습니다!', 'success');
+        showToast('🎉 원고와 사진이 성공적으로 접수되었습니다! (비밀번호 설정 완료)', 'success');
       }
 
-      setTimeout(function() { switchTab('gallery'); }, 600);
+      updateStats();
+      if (state.isAdmin) {
+        setTimeout(function() { switchTab('gallery'); }, 600);
+      }
     };
 
     window.resetForm = function() {
@@ -732,6 +1270,7 @@
       document.getElementById('articleDate').value = article.date || '';
       document.getElementById('targetGrade').value = article.targetGrade || '';
       document.getElementById('authorName').value = article.authorName || '';
+      document.getElementById('articlePassword').value = article.password || '';
       document.getElementById('articleContent').value = article.content || '';
       document.getElementById('articleTags').value = (article.tags || []).join(', ');
 
@@ -760,6 +1299,9 @@
       showToast('원고 수정이 취소되었습니다.', 'info');
     };
 
+    // ==========================================
+    // 🎨 갤러리 및 모달 렌더링
+    // ==========================================
     function renderGallery() {
       var container = document.getElementById('galleryCardsContainer');
       var countEl = document.getElementById('galleryCount');
@@ -892,8 +1434,8 @@
 
       html += '<div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-200">';
       html += '<div class="flex items-center gap-2">';
-      html += '<button type="button" onclick="startEditArticle(\'' + article.id + '\')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow"><i data-lucide="edit-3" class="w-4 h-4"></i> 원고 수정하기</button>';
-      html += '<button type="button" onclick="deleteArticle(\'' + article.id + '\')" class="px-3.5 py-2.5 text-rose-600 hover:bg-rose-50 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1 transition"><i data-lucide="trash-2" class="w-4 h-4"></i> 원고 삭제</button>';
+      html += '<button type="button" onclick="verifyAndEditArticle(\'' + article.id + '\')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow"><i data-lucide="edit-3" class="w-4 h-4"></i> 원고 수정하기</button>';
+      html += '<button type="button" onclick="verifyAndDeleteArticle(\'' + article.id + '\')" class="px-3.5 py-2.5 text-rose-600 hover:bg-rose-50 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1 transition"><i data-lucide="trash-2" class="w-4 h-4"></i> 원고 삭제</button>';
       html += '</div>';
       html += '<button type="button" onclick="closeModal()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl text-xs sm:text-sm font-semibold">닫기</button>';
       html += '</div></div>';
@@ -911,13 +1453,16 @@
 
     window.deleteArticle = function(articleId) {
       if (!confirm('정말로 이 원고를 삭제하시겠습니까? (삭제 후 복구할 수 없습니다)')) return;
-      state.articles = state.articles.filter(function(a) { return a.id !== articleId; });
-      saveArticles();
+      deleteArticleFromCentral(articleId);
       closeModal();
       renderCurrentTab();
+      updateStats();
       showToast('원고가 삭제되었습니다.', 'info');
     };
 
+    // ==========================================
+    // 📊 관리자 대시보드 테이블
+    // ==========================================
     function renderAdminTable() {
       var tbody = document.getElementById('adminTableBody');
       if (!tbody) return;
@@ -951,9 +1496,9 @@
         html += '<option value="revision" ' + (article.status === 'revision' ? 'selected' : '') + '>보완요청</option>';
         html += '</select></td>';
         html += '<td class="px-4 py-3 text-xs text-right space-x-1">';
-        html += '<button type="button" onclick="startEditArticle(\'' + article.id + '\')" title="원고 수정" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"><i data-lucide="edit-3" class="w-4 h-4"></i></button>';
+        html += '<button type="button" onclick="verifyAndEditArticle(\'' + article.id + '\')" title="원고 수정" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"><i data-lucide="edit-3" class="w-4 h-4"></i></button>';
         html += '<button type="button" onclick="openArticleModal(\'' + article.id + '\')" title="상세보기" class="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition"><i data-lucide="eye" class="w-4 h-4"></i></button>';
-        html += '<button type="button" onclick="deleteArticle(\'' + article.id + '\')" title="삭제" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>';
+        html += '<button type="button" onclick="verifyAndDeleteArticle(\'' + article.id + '\')" title="삭제" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>';
         html += '</td></tr>';
       });
 
@@ -965,7 +1510,8 @@
       var article = state.articles.find(function(a) { return a.id === articleId; });
       if (article) {
         article.status = newStatus;
-        saveArticles();
+        saveArticleToCentral(article);
+        updateStats();
         showToast('원고 상태가 ' + (STATUS_LABELS[newStatus] ? STATUS_LABELS[newStatus].name : newStatus) + '(으)로 변경되었습니다.', 'success');
       }
     };
@@ -987,6 +1533,9 @@
       if (statCurriculum) statCurriculum.textContent = curriculumCount;
     }
 
+    // ==========================================
+    // 📊 엑셀(CSV) 및 백업 데이터 다운로드
+    // ==========================================
     window.exportToCsv = function() {
       if (state.articles.length === 0) { showToast('내보낼 원고 데이터가 없습니다.', 'warning'); return; }
       var headers = ['원고ID', '구분', '제목', '부제목', '활동기간', '대상학년_인원', '작성자성명', '수록상태', '사진수', '활동내용', '접수일'];
@@ -1027,26 +1576,6 @@
       link.click();
       document.body.removeChild(link);
       showToast('💾 JSON 백업 파일이 저장되었습니다.', 'success');
-    };
-
-    window.importFromJson = function(event) {
-      var file = event.target.files[0];
-      if (!file) return;
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          var imported = JSON.parse(e.target.result);
-          if (Array.isArray(imported)) {
-            if (confirm('불러온 백업 파일에서 ' + imported.length + '건의 원고를 발견했습니다. 기존 목록에 복원하시겠습니까?')) {
-              state.articles = imported;
-              saveArticles();
-              renderCurrentTab();
-              showToast('✅ ' + imported.length + '건의 원고 데이터를 성공적으로 복원했습니다.', 'success');
-            }
-          } else { showToast('올바른 교지 백업 JSON 형식이 아닙니다.', 'error'); }
-        } catch (err) { showToast('JSON 파싱 오류가 발생했습니다.', 'error'); }
-      };
-      reader.readAsText(file);
     };
 
     function showToast(message, type) {
