@@ -1,1 +1,1082 @@
-https://github.com/m23kjb8812-hue/ohyun2026/edit/main/index.html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026학년도 오현중학교 교지(소식지) 원고 수집관</title>
+  <!-- Pretendard Web Font -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    * {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    }
+    body { background-color: #f8fafc; color: #1e293b; }
+    
+    /* Badge Styles */
+    .badge-club { background-color: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; }
+    .badge-curriculum { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .badge-competition { background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+    .badge-event { background-color: #fce7f3; color: #be185d; border: 1px solid #fbcfe8; }
+    .badge-essay { background-color: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+
+    /* Status Badges */
+    .status-submitted { background-color: #e2e8f0; color: #475569; }
+    .status-reviewing { background-color: #fef9c3; color: #854d0e; }
+    .status-confirmed { background-color: #bbf7d0; color: #166534; font-weight: 600; }
+    .status-revision { background-color: #fee2e2; color: #991b1b; }
+
+    .fade-in { animation: fadeIn 0.2s ease-in-out; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .drag-active {
+      border-color: #2563eb !important;
+      background-color: #eff6ff !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800 flex flex-col justify-between">
+
+  <!-- 상단 네비게이션 헤더 -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- 학교 로고 및 시스템 명 -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 flex items-center justify-center text-white font-black text-xl shadow-md">
+            오
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-extrabold text-slate-900 text-base sm:text-lg tracking-tight">오현중학교</span>
+              <span class="text-xs px-2.5 py-0.5 bg-blue-100 text-blue-800 font-bold rounded-full">2026 교지</span>
+            </div>
+            <p class="text-[11px] text-slate-500 hidden sm:block">1년의 기록 · 교지(소식지) 원고 및 사진 수집 시스템</p>
+          </div>
+        </div>
+
+        <!-- 탭 네비게이션 버튼 -->
+        <nav class="flex items-center gap-1.5 sm:gap-2">
+          <button type="button" onclick="switchTab('submit')" data-tab="submit" class="tab-btn px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-blue-600 text-white shadow-sm">
+            <i data-lucide="edit-3" class="w-4 h-4"></i>
+            <span>원고 등록</span>
+          </button>
+          <button type="button" onclick="switchTab('gallery')" data-tab="gallery" class="tab-btn px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+            <i data-lucide="grid" class="w-4 h-4"></i>
+            <span>접수 현황 (모아보기)</span>
+          </button>
+          <button type="button" onclick="switchTab('admin')" data-tab="admin" class="tab-btn px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+            <span>편집 관리 (엑셀)</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 상단 배너 -->
+  <section class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white py-8 px-4 shadow-inner">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-blue-800/60 rounded-full text-xs font-semibold text-blue-200 border border-blue-700/50 mb-2">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+          2026학년도 오현중학교 교지(소식지) 제작을 위한 원고 접수
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          오현의 1년, 소중한 교육활동의 기록
+        </h1>
+        <p class="text-xs sm:text-sm text-blue-100/80 mt-1 max-w-2xl">
+          선생님들께서 운영하신 자율동아리, 교과활동, 대회 및 행사 프로그램의 사진과 내용을 등록해주세요.
+        </p>
+      </div>
+
+      <!-- 실시간 접수 통계 뱃지 -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full md:w-auto">
+        <div class="bg-white/10 backdrop-blur border border-white/10 rounded-xl p-3 text-center min-w-[90px]">
+          <span class="text-xs text-blue-200 block">전체 접수</span>
+          <span id="statTotalArticles" class="text-xl font-black text-white">0</span>
+        </div>
+        <div class="bg-white/10 backdrop-blur border border-white/10 rounded-xl p-3 text-center min-w-[90px]">
+          <span class="text-xs text-emerald-300 block">수록 확정</span>
+          <span id="statConfirmedArticles" class="text-xl font-black text-emerald-400">0</span>
+        </div>
+        <div class="bg-white/10 backdrop-blur border border-white/10 rounded-xl p-3 text-center min-w-[90px]">
+          <span class="text-xs text-indigo-200 block">자율동아리</span>
+          <span id="statClubs" class="text-xl font-black text-indigo-300">0</span>
+        </div>
+        <div class="bg-white/10 backdrop-blur border border-white/10 rounded-xl p-3 text-center min-w-[90px]">
+          <span class="text-xs text-amber-200 block">교과/대회</span>
+          <span id="statCurriculum" class="text-xl font-black text-amber-300">0</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 메인 컨텐츠 영역 -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+
+    <!-- ============================================== -->
+    <!-- 탭 1: 원고 등록 및 수정 폼 (Submit & Edit Tab) -->
+    <!-- ============================================== -->
+    <div id="tab-submit" class="tab-pane">
+      <div class="max-w-4xl mx-auto bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-10">
+        
+        <!-- 수정 모드 알림 배너 -->
+        <div id="editModeBanner" class="hidden mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2 text-xs sm:text-sm font-bold text-amber-900">
+            <i data-lucide="edit" class="w-5 h-5 text-amber-600 shrink-0"></i>
+            <span>[원고 수정 모드] '<span id="editArticleIdText" class="text-blue-700"></span>' 원고를 수정하고 있습니다.</span>
+          </div>
+          <button type="button" id="cancelEditBtn" onclick="cancelEdit()" class="px-3 py-1.5 bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-xl text-xs font-bold shrink-0 transition">
+            수정 취소
+          </button>
+        </div>
+
+        <div class="border-b border-slate-100 pb-6 mb-8">
+          <h2 class="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2.5">
+            <span class="p-2 rounded-xl bg-blue-50 text-blue-600">
+              <i data-lucide="pen-tool" class="w-6 h-6"></i>
+            </span>
+            교지(소식지) 원고 기입 및 사진 첨부
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1 pl-11">
+            오현중학교 교지에 수록될 프로그램/동아리 제목, 사진, 활동 내용을 입력해주세요.
+          </p>
+        </div>
+
+        <form id="magazineSubmitForm" onsubmit="handleFormSubmit(event)" class="space-y-8">
+          
+          <!-- 1단계: 기본 정보 -->
+          <div class="space-y-4">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2 border-l-4 border-blue-600 pl-2.5">
+              1. 활동 및 프로그램 기본 정보
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- 프로그램/동아리 제목 (필수) -->
+              <div class="md:col-span-2">
+                <label for="articleTitle" class="block text-xs font-bold text-slate-700 mb-1">
+                  프로그램 / 동아리 제목 <span class="text-rose-500">* (필수)</span>
+                </label>
+                <input type="text" id="articleTitle" required
+                  placeholder="예: 자율동아리 [벅스빌]"
+                  class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition bg-slate-50/50 hover:bg-white focus:bg-white">
+              </div>
+
+              <!-- 부제목 / 한줄 요약 -->
+              <div class="md:col-span-2">
+                <label for="articleSubtitle" class="block text-xs font-bold text-slate-700 mb-1">
+                  부제목 또는 한 줄 요약 (선택)
+                </label>
+                <input type="text" id="articleSubtitle"
+                  placeholder="예: 알고리즘 코딩부터 아두이노 트랙 주행까지"
+                  class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition bg-slate-50/50 hover:bg-white focus:bg-white">
+              </div>
+
+              <!-- 카테고리 (필수) -->
+              <div>
+                <label for="articleCategory" class="block text-xs font-bold text-slate-700 mb-1">
+                  카테고리 구분 <span class="text-rose-500">* (필수)</span>
+                </label>
+                <select id="articleCategory" required
+                  class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                  <option value="">카테고리를 선택하세요</option>
+                  <option value="club">🎨 자율동아리 및 동아리 활동</option>
+                  <option value="curriculum">📚 교과활동 및 융합 수업 프로젝트</option>
+                  <option value="competition">🏆 대회 및 교외 프로그램 (경진대회, 체험학습 등)</option>
+                  <option value="event">🏫 학교/학급 행사 (축제, 체육대회, 연주회 등)</option>
+                  <option value="essay">✍️ 자유 기고 / 칼럼</option>
+                </select>
+              </div>
+
+              <!-- 활동 기간 / 일시 -->
+              <div>
+                <label for="articleDate" class="block text-xs font-bold text-slate-700 mb-1">
+                  활동 기간 또는 일시
+                </label>
+                <input type="text" id="articleDate"
+                  placeholder="예: 2026.03 ~ 2026.11 또는 2026년 9월"
+                  class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+              </div>
+
+              <!-- 참여 대상 / 학년 및 인원 -->
+              <div class="md:col-span-2">
+                <label for="targetGrade" class="block text-xs font-bold text-slate-700 mb-1">
+                  참여 대상 / 학년 및 인원
+                </label>
+                <input type="text" id="targetGrade"
+                  placeholder="예: 1~3학년 (동아리원 18명) 또는 2학년 전체"
+                  class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+              </div>
+            </div>
+          </div>
+
+          <!-- 2단계: 사진 첨부 (필수 요구사항 충족) -->
+          <div class="space-y-4 pt-4 border-t border-slate-100">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2 border-l-4 border-blue-600 pl-2.5">
+                2. 사진 첨부 <span class="text-rose-500">* (필수)</span>
+              </h3>
+              <span class="text-xs text-slate-500">다중 업로드 지원 / 사진별 캡션 입력 가능</span>
+            </div>
+
+            <!-- 파일 드롭존 -->
+            <div id="photoDropZone" onclick="document.getElementById('photoInput').click()"
+              class="border-2 border-dashed border-slate-300 hover:border-blue-500 bg-slate-50/70 hover:bg-blue-50/40 rounded-2xl p-6 sm:p-8 text-center cursor-pointer transition-all duration-200 group">
+              <input type="file" id="photoInput" multiple accept="image/*" class="hidden" onchange="if(this.files&&this.files.length) handleImageFiles(this.files)">
+              <div class="w-12 h-12 mx-auto rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                <i data-lucide="image-plus" class="w-6 h-6"></i>
+              </div>
+              <p class="text-sm font-bold text-slate-700">
+                사진을 이곳으로 드래그하거나 <span class="text-blue-600 underline">클릭하여 선택</span>하세요
+              </p>
+              <p class="text-xs text-slate-400 mt-1">
+                JPG, PNG, WebP 등 이미지 파일 (여러 장 동시 선택 가능)
+              </p>
+            </div>
+
+            <!-- 첨부된 사진 목록 및 캡션 입력 갤러리 -->
+            <div id="uploadedPhotosList"></div>
+          </div>
+
+          <!-- 3단계: 상세 활동 내용 -->
+          <div class="space-y-4 pt-4 border-t border-slate-100">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2 border-l-4 border-blue-600 pl-2.5">
+                3. 교지 수록 활동 내용 <span class="text-rose-500">* (필수)</span>
+              </h3>
+              <span class="text-xs text-slate-400">현재 글자 수: <strong id="charCount" class="text-blue-600">0</strong>자</span>
+            </div>
+
+            <div>
+              <label for="articleContent" class="block text-xs font-bold text-slate-700 mb-1">
+                활동 내용 및 운영 개요 <span class="text-rose-500">* (필수)</span>
+              </label>
+              <textarea id="articleContent" rows="8" required
+                oninput="document.getElementById('charCount').textContent = this.value.length"
+                placeholder="1년 동안 진행된 프로그램 또는 동아리의 주요 활동 내용, 운영 과정, 행사 진행 내용 등을 자유롭게 작성해주세요. 교지 편집위원회에서 지면 구성 시 원고로 활용됩니다."
+                class="w-full p-4 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 outline-none leading-relaxed transition bg-slate-50/50 hover:bg-white focus:bg-white"></textarea>
+            </div>
+
+            <!-- 키워드 태그 -->
+            <div>
+              <label for="articleTags" class="block text-xs font-bold text-slate-700 mb-1">
+                관련 키워드 태그 (콤마로 구분, 선택)
+              </label>
+              <input type="text" id="articleTags"
+                placeholder="예: 자율동아리, AI로봇, 대회"
+                class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+            </div>
+          </div>
+
+          <!-- 4단계: 작성자 정보 -->
+          <div class="space-y-4 pt-4 border-t border-slate-100">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2 border-l-4 border-blue-600 pl-2.5">
+              4. 작성자 정보
+            </h3>
+            
+            <div>
+              <label for="authorName" class="block text-xs font-bold text-slate-700 mb-1">
+                작성자 성명 (교사명)
+              </label>
+              <input type="text" id="authorName" placeholder="예: 홍길동 선생님 또는 담당 교사 성명"
+                class="w-full sm:w-80 px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+            </div>
+          </div>
+
+          <!-- 제출 액션 버튼 -->
+          <div class="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-end gap-3">
+            <button type="reset" onclick="resetForm()" class="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-100 text-xs sm:text-sm font-bold transition">
+              초기화
+            </button>
+            <button type="submit" class="w-full sm:w-auto px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-lg shadow-blue-600/30 transition flex items-center justify-center gap-2">
+              <i data-lucide="send" class="w-4 h-4"></i>
+              <span id="submitBtnText">원고 및 사진 접수하기</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 탭 2: 접수 현황 모아보기 (Gallery Tab) -->
+    <!-- ============================================== -->
+    <div id="tab-gallery" class="tab-pane hidden">
+      <div class="space-y-6">
+        
+        <!-- 검색 및 카테고리 필터 컨트롤 바 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+          <!-- 카테고리 필터 버튼 -->
+          <div id="categoryFilters" class="flex items-center gap-1.5 flex-wrap w-full md:w-auto">
+            <button type="button" onclick="setCategoryFilter('all', this)" data-filter="all" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition bg-blue-600 text-white shadow-sm">
+              전체 보기
+            </button>
+            <button type="button" onclick="setCategoryFilter('club', this)" data-filter="club" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition bg-white text-slate-700 hover:bg-slate-100 border border-slate-200">
+              🎨 자율동아리
+            </button>
+            <button type="button" onclick="setCategoryFilter('curriculum', this)" data-filter="curriculum" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition bg-white text-slate-700 hover:bg-slate-100 border border-slate-200">
+              📚 교과활동
+            </button>
+            <button type="button" onclick="setCategoryFilter('competition', this)" data-filter="competition" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition bg-white text-slate-700 hover:bg-slate-100 border border-slate-200">
+              🏆 대회 및 교외
+            </button>
+            <button type="button" onclick="setCategoryFilter('event', this)" data-filter="event" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition bg-white text-slate-700 hover:bg-slate-100 border border-slate-200">
+              🏫 학교 행사
+            </button>
+            <button type="button" onclick="setCategoryFilter('essay', this)" data-filter="essay" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition bg-white text-slate-700 hover:bg-slate-100 border border-slate-200">
+              ✍️ 자유 기고
+            </button>
+          </div>
+
+          <!-- 검색창 -->
+          <div class="relative w-full md:w-72">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="gallerySearch" placeholder="원고 제목, 내용, 작성자 검색..."
+              oninput="state.searchQuery = this.value.trim().toLowerCase(); renderGallery();"
+              class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 focus:bg-white transition">
+          </div>
+        </div>
+
+        <!-- 갤러리 개수 표시 및 신규 등록 안내 -->
+        <div class="flex items-center justify-between px-1">
+          <p id="galleryCount" class="text-xs font-bold text-slate-500 font-mono">총 0건의 접수 원고</p>
+          <button type="button" onclick="switchTab('submit')" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i> 새 원고 작성하기
+          </button>
+        </div>
+
+        <!-- 원고 카드 그리드 컨테이너 -->
+        <div id="galleryCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 탭 3: 편집위원회 관리 대시보드 (Admin Tab) -->
+    <!-- ============================================== -->
+    <div id="tab-admin" class="tab-pane hidden">
+      <div class="space-y-6">
+        
+        <!-- 관리 툴바 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+              <i data-lucide="shield-check" class="w-5 h-5 text-blue-600"></i>
+              교지 편집위원회 원고 관리 센터
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">
+              접수된 원고를 검토하고 수록 여부를 지정하거나 엑셀(CSV) 파일로 일괄 내려받습니다.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2 flex-wrap w-full md:w-auto justify-end">
+            <button type="button" onclick="exportToCsv()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow transition">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+              엑셀(CSV) 다운로드
+            </button>
+            <button type="button" onclick="exportToJson()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow transition">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              데이터 백업
+            </button>
+            <label class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer transition">
+              <i data-lucide="upload" class="w-4 h-4"></i>
+              백업 복구
+              <input type="file" accept=".json" onchange="importFromJson(event)" class="hidden">
+            </label>
+          </div>
+        </div>
+
+        <!-- 원고 관리 테이블 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 text-slate-600 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
+                  <th class="px-4 py-3.5 w-12">No</th>
+                  <th class="px-4 py-3.5">프로그램 / 동아리 명</th>
+                  <th class="px-4 py-3.5">카테고리</th>
+                  <th class="px-4 py-3.5">작성자(교사)</th>
+                  <th class="px-4 py-3.5">접수일</th>
+                  <th class="px-4 py-3.5">수록 상태</th>
+                  <th class="px-4 py-3.5 text-right">수정 / 삭제</th>
+                </tr>
+              </thead>
+              <tbody id="adminTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 상세 보기 & 수정/삭제 모달 -->
+  <div id="articleModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto" onclick="if(event.target===this) closeModal()">
+    <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative">
+      <button type="button" id="closeModalBtn" onclick="closeModal()" class="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition z-10">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div id="articleModalBody"></div>
+    </div>
+  </div>
+
+  <!-- 토스트 알림 컨테이너 -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- 푸터 -->
+  <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 mt-12">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-slate-800">오현중학교 교지편집위원회</span>
+        <span>· 2026학년도 1년의 기록</span>
+      </div>
+      <p class="text-slate-400">Ohyeon Middle School Annual Magazine Editorial Platform</p>
+    </div>
+  </footer>
+
+  <script>
+    var STORAGE_KEY = 'ohyeon_magazine_articles_2026_v2';
+
+    var CATEGORIES = {
+      club: { name: '자율동아리', badgeClass: 'badge-club', icon: 'palette' },
+      curriculum: { name: '교과활동', badgeClass: 'badge-curriculum', icon: 'book-open' },
+      competition: { name: '대회 및 교외', badgeClass: 'badge-competition', icon: 'trophy' },
+      event: { name: '학교 행사', badgeClass: 'badge-event', icon: 'sparkles' },
+      essay: { name: '자유 기고', badgeClass: 'badge-essay', icon: 'feather' }
+    };
+
+    var STATUS_LABELS = {
+      submitted: { name: '접수완료', class: 'status-submitted' },
+      reviewing: { name: '검토중', class: 'status-reviewing' },
+      confirmed: { name: '수록확정', class: 'status-confirmed' },
+      revision: { name: '보완요청', class: 'status-revision' }
+    };
+
+    var state = {
+      articles: [],
+      activeTab: 'submit',
+      filterCategory: 'all',
+      searchQuery: '',
+      uploadedPhotos: [],
+      selectedArticleForModal: null,
+      editingArticleId: null
+    };
+
+    function initApp() {
+      try {
+        if (localStorage.getItem('ohyeon_magazine_articles_2026')) {
+          localStorage.removeItem('ohyeon_magazine_articles_2026');
+        }
+      } catch (e) {}
+      loadArticles();
+      initDropZone();
+      renderCurrentTab();
+      updateStats();
+      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
+
+    function loadArticles() {
+      try {
+        var saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          state.articles = JSON.parse(saved);
+        } else {
+          state.articles = [];
+          saveArticles();
+        }
+      } catch (e) {
+        state.articles = [];
+      }
+    }
+
+    function saveArticles() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.articles));
+      } catch (e) {
+        showToast('저장 공간 초과 오류가 발생했습니다. 사진 크기를 줄여주세요.', 'error');
+      }
+      updateStats();
+    }
+
+    function initDropZone() {
+      var dropZone = document.getElementById('photoDropZone');
+      if (dropZone) {
+        dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.classList.add('drag-active'); });
+        dropZone.addEventListener('dragleave', function(e) { e.preventDefault(); dropZone.classList.remove('drag-active'); });
+        dropZone.addEventListener('drop', function(e) {
+          e.preventDefault(); dropZone.classList.remove('drag-active');
+          if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) handleImageFiles(e.dataTransfer.files);
+        });
+      }
+    }
+
+    window.switchTab = function(tabName) {
+      state.activeTab = tabName;
+      document.querySelectorAll('.tab-btn').forEach(function(btn) {
+        if (btn.getAttribute('data-tab') === tabName) {
+          btn.className = 'tab-btn px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-blue-600 text-white shadow-sm';
+        } else {
+          btn.className = 'tab-btn px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100';
+        }
+      });
+
+      document.querySelectorAll('.tab-pane').forEach(function(pane) { pane.classList.add('hidden'); });
+      var activePane = document.getElementById('tab-' + tabName);
+      if (activePane) {
+        activePane.classList.remove('hidden');
+        activePane.classList.add('fade-in');
+      }
+
+      renderCurrentTab();
+      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
+    };
+
+    window.setCategoryFilter = function(filter, el) {
+      state.filterCategory = filter;
+      var buttons = document.querySelectorAll('#categoryFilters button');
+      buttons.forEach(function(b) {
+        b.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold transition bg-white text-slate-700 hover:bg-slate-100 border border-slate-200';
+      });
+      if (el) el.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition bg-blue-600 text-white shadow-sm';
+      renderGallery();
+    };
+
+    function renderCurrentTab() {
+      if (state.activeTab === 'gallery') renderGallery();
+      else if (state.activeTab === 'admin') renderAdminTable();
+    }
+
+    window.handleImageFiles = function(files) {
+      var allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
+      var maxDim = 1200;
+      Array.from(files).forEach(function(file) {
+        if (!allowed.includes(file.type)) {
+          showToast(file.name + '은(는) 지원되지 않는 이미지 형식입니다.', 'error');
+          return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var img = new Image();
+          img.onload = function() {
+            var w = img.width, h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+              else { w = Math.round((w * maxDim) / h); h = maxDim; }
+            }
+            var canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            var isCover = state.uploadedPhotos.length === 0;
+            state.uploadedPhotos.push({
+              url: canvas.toDataURL('image/jpeg', 0.85),
+              caption: '',
+              isCover: isCover,
+              name: file.name
+            });
+            renderUploadedPhotos();
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    };
+
+    function renderUploadedPhotos() {
+      var container = document.getElementById('uploadedPhotosList');
+      if (!container) return;
+      if (state.uploadedPhotos.length === 0) { container.innerHTML = ''; return; }
+
+      var html = '<div class="mb-2 text-sm font-semibold text-slate-700 flex items-center justify-between">';
+      html += '<span>첨부된 사진 (' + state.uploadedPhotos.length + '장) - 사진별 설명(캡션)을 입력해주세요</span>';
+      html += '<span class="text-xs text-blue-600 font-medium">★ 대표 사진 지정 가능</span></div>';
+      html += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">';
+
+      state.uploadedPhotos.forEach(function(photo, idx) {
+        html += '<div class="border rounded-xl p-3 bg-slate-50 relative ' + (photo.isCover ? 'ring-2 ring-blue-500 bg-blue-50/40' : '') + '">';
+        html += '<div class="relative w-full h-40 bg-slate-200 rounded-lg overflow-hidden mb-2">';
+        html += '<img src="' + photo.url + '" class="w-full h-full object-cover">';
+        html += '<button type="button" onclick="setCoverPhoto(' + idx + ')" class="absolute top-2 left-2 px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shadow ' + (photo.isCover ? 'bg-blue-600 text-white' : 'bg-white/90 text-slate-700 hover:bg-white') + '">';
+        html += '<i data-lucide="' + (photo.isCover ? 'check-circle' : 'star') + '" class="w-3.5 h-3.5"></i> ' + (photo.isCover ? '대표 커버' : '대표 지정') + '</button>';
+        html += '<button type="button" onclick="removePhoto(' + idx + ')" class="absolute top-2 right-2 p-1.5 rounded-full bg-rose-600 text-white shadow hover:bg-rose-700"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>';
+        html += '</div>';
+        html += '<label class="block text-xs font-medium text-slate-600 mb-1">사진 설명 (교지 캡션)</label>';
+        html += '<input type="text" value="' + escapeHtml(photo.caption || '') + '" placeholder="예: 활동 사진 설명" oninput="updatePhotoCaption(' + idx + ', this.value)" class="w-full text-xs px-2.5 py-1.5 border rounded-lg focus:ring-1 focus:ring-blue-500 bg-white outline-none">';
+        html += '</div>';
+      });
+
+      html += '</div>';
+      container.innerHTML = html;
+      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
+    }
+
+    window.setCoverPhoto = function(index) {
+      state.uploadedPhotos.forEach(function(p, idx) { p.isCover = (idx === index); });
+      renderUploadedPhotos();
+    };
+
+    window.removePhoto = function(index) {
+      state.uploadedPhotos.splice(index, 1);
+      if (state.uploadedPhotos.length > 0 && !state.uploadedPhotos.some(function(p) { return p.isCover; })) {
+        state.uploadedPhotos[0].isCover = true;
+      }
+      renderUploadedPhotos();
+    };
+
+    window.updatePhotoCaption = function(index, caption) {
+      if (state.uploadedPhotos[index]) {
+        state.uploadedPhotos[index].caption = caption;
+      }
+    };
+
+    window.handleFormSubmit = function(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      var title = document.getElementById('articleTitle').value.trim();
+      var subtitle = document.getElementById('articleSubtitle').value.trim();
+      var category = document.getElementById('articleCategory').value;
+      var date = document.getElementById('articleDate').value.trim();
+      var targetGrade = document.getElementById('targetGrade').value.trim();
+      var authorName = document.getElementById('authorName').value.trim();
+      var content = document.getElementById('articleContent').value.trim();
+      var tagsInput = document.getElementById('articleTags').value.trim();
+
+      if (!title) { showToast('프로그램 또는 동아리 제목을 입력해주세요.', 'warning'); document.getElementById('articleTitle').focus(); return; }
+      if (!category) { showToast('카테고리를 선택해주세요.', 'warning'); document.getElementById('articleCategory').focus(); return; }
+      if (!content) { showToast('교지에 수록할 활동 내용을 작성해주세요.', 'warning'); document.getElementById('articleContent').focus(); return; }
+
+      var tags = tagsInput
+        ? tagsInput.split(',').map(function(t) { return t.trim(); }).filter(function(t) { return t; }).map(function(t) { return t.startsWith('#') ? t : '#' + t; })
+        : ['#' + (CATEGORIES[category] ? CATEGORIES[category].name : '오현중')];
+
+      var photos = state.uploadedPhotos.slice();
+
+      if (state.editingArticleId) {
+        var existingIndex = state.articles.findIndex(function(a) { return a.id === state.editingArticleId; });
+        if (existingIndex !== -1) {
+          state.articles[existingIndex].title = title;
+          state.articles[existingIndex].subtitle = subtitle;
+          state.articles[existingIndex].category = category;
+          state.articles[existingIndex].categoryName = CATEGORIES[category] ? CATEGORIES[category].name : '기타';
+          state.articles[existingIndex].date = date || '2026학년도 연중';
+          state.articles[existingIndex].targetGrade = targetGrade || '해당 학생';
+          state.articles[existingIndex].authorName = authorName || '선생님';
+          state.articles[existingIndex].content = content;
+          state.articles[existingIndex].tags = tags;
+          state.articles[existingIndex].photos = photos;
+          state.articles[existingIndex].updatedAt = new Date().toISOString().split('T')[0];
+          saveArticles();
+          showToast('✅ 원고가 성공적으로 수정되었습니다.', 'success');
+        }
+        cancelEdit();
+      } else {
+        var newArticle = {
+          id: 'ohyeon-2026-' + Date.now().toString().slice(-4),
+          title: title,
+          subtitle: subtitle,
+          category: category,
+          categoryName: CATEGORIES[category] ? CATEGORIES[category].name : '기타',
+          date: date || '2026학년도 연중',
+          targetGrade: targetGrade || '해당 학생',
+          authorName: authorName || '선생님',
+          status: 'submitted',
+          createdAt: new Date().toISOString().split('T')[0],
+          content: content,
+          tags: tags,
+          photos: photos
+        };
+
+        state.articles.unshift(newArticle);
+        saveArticles();
+        resetForm();
+        showToast('🎉 원고와 사진이 성공적으로 접수되었습니다!', 'success');
+      }
+
+      setTimeout(function() { switchTab('gallery'); }, 600);
+    };
+
+    window.resetForm = function() {
+      document.getElementById('magazineSubmitForm').reset();
+      state.uploadedPhotos = [];
+      renderUploadedPhotos();
+      var charCountEl = document.getElementById('charCount');
+      if (charCountEl) charCountEl.textContent = '0';
+      state.editingArticleId = null;
+      var editBanner = document.getElementById('editModeBanner');
+      if (editBanner) editBanner.classList.add('hidden');
+      var submitBtnText = document.getElementById('submitBtnText');
+      if (submitBtnText) submitBtnText.textContent = '원고 및 사진 접수하기';
+    };
+
+    window.startEditArticle = function(articleId) {
+      closeModal();
+      var article = state.articles.find(function(a) { return a.id === articleId; });
+      if (!article) return;
+
+      state.editingArticleId = articleId;
+      switchTab('submit');
+
+      document.getElementById('articleTitle').value = article.title || '';
+      document.getElementById('articleSubtitle').value = article.subtitle || '';
+      document.getElementById('articleCategory').value = article.category || '';
+      document.getElementById('articleDate').value = article.date || '';
+      document.getElementById('targetGrade').value = article.targetGrade || '';
+      document.getElementById('authorName').value = article.authorName || '';
+      document.getElementById('articleContent').value = article.content || '';
+      document.getElementById('articleTags').value = (article.tags || []).join(', ');
+
+      var charCountEl = document.getElementById('charCount');
+      if (charCountEl) charCountEl.textContent = (article.content || '').length;
+
+      state.uploadedPhotos = (article.photos || []).map(function(p) { return Object.assign({}, p); });
+      renderUploadedPhotos();
+
+      var editBanner = document.getElementById('editModeBanner');
+      if (editBanner) {
+        editBanner.classList.remove('hidden');
+        var editIdEl = document.getElementById('editArticleIdText');
+        if (editIdEl) editIdEl.textContent = article.title;
+      }
+
+      var submitBtnText = document.getElementById('submitBtnText');
+      if (submitBtnText) submitBtnText.textContent = '원고 수정 완료 (저장)';
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      showToast('✏️ 원고 수정 모드로 전환되었습니다.', 'info');
+    };
+
+    window.cancelEdit = function() {
+      resetForm();
+      showToast('원고 수정이 취소되었습니다.', 'info');
+    };
+
+    function renderGallery() {
+      var container = document.getElementById('galleryCardsContainer');
+      var countEl = document.getElementById('galleryCount');
+      if (!container) return;
+
+      var filtered = state.articles;
+      if (state.filterCategory !== 'all') {
+        filtered = filtered.filter(function(a) { return a.category === state.filterCategory; });
+      }
+      if (state.searchQuery) {
+        filtered = filtered.filter(function(a) {
+          return a.title.toLowerCase().includes(state.searchQuery) ||
+            (a.subtitle && a.subtitle.toLowerCase().includes(state.searchQuery)) ||
+            a.content.toLowerCase().includes(state.searchQuery) ||
+            a.authorName.toLowerCase().includes(state.searchQuery) ||
+            (a.tags && a.tags.some(function(t) { return t.toLowerCase().includes(state.searchQuery); }));
+        });
+      }
+
+      if (countEl) countEl.textContent = '총 ' + filtered.length + '건의 접수 원고';
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="col-span-full py-16 text-center text-slate-500 bg-white rounded-3xl border border-dashed border-slate-300">' +
+          '<i data-lucide="folder-open" class="w-12 h-12 mx-auto text-slate-300 mb-3"></i>' +
+          '<p class="text-lg font-bold text-slate-700">접수된 교지 원고가 없습니다</p>' +
+          '<p class="text-xs sm:text-sm text-slate-400 mt-1">첫 번째 동아리 또는 교육활동 원고를 등록해 보세요.</p>' +
+          '<button type="button" onclick="switchTab(\'submit\')" class="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-xs sm:text-sm font-bold shadow-md transition">' +
+          '<i data-lucide="plus-circle" class="w-4 h-4"></i> 새 원고 등록하기</button></div>';
+        try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
+        return;
+      }
+
+      var html = '';
+      filtered.forEach(function(article) {
+        var coverPhoto = (article.photos && article.photos.find(function(p) { return p.isCover; })) || (article.photos && article.photos[0]) || {};
+        var cat = CATEGORIES[article.category] || { name: '기타', badgeClass: 'badge-club' };
+        var status = STATUS_LABELS[article.status] || { name: '접수완료', class: 'status-submitted' };
+
+        html += '<article class="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group cursor-pointer" onclick="openArticleModal(\'' + article.id + '\')">';
+        
+        if (coverPhoto.url) {
+          html += '<div class="relative w-full h-48 bg-slate-100 overflow-hidden">';
+          html += '<img src="' + coverPhoto.url + '" alt="' + escapeHtml(article.title) + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">';
+          html += '<div class="absolute top-3 left-3 flex gap-1.5"><span class="px-2.5 py-1 rounded-full text-xs font-bold ' + cat.badgeClass + ' shadow-sm">' + cat.name + '</span></div>';
+          html += '<div class="absolute top-3 right-3"><span class="px-2.5 py-0.5 rounded-full text-xs ' + status.class + ' shadow-sm">' + status.name + '</span></div>';
+          if (article.photos && article.photos.length > 1) {
+            html += '<span class="absolute bottom-3 right-3 px-2 py-0.5 rounded-md bg-black/60 text-white text-xs font-medium backdrop-blur-sm flex items-center gap-1"><i data-lucide="image" class="w-3 h-3"></i> ' + article.photos.length + '</span>';
+          }
+          html += '</div>';
+        } else {
+          html += '<div class="p-4 bg-slate-100 border-b border-slate-200 flex items-center justify-between">';
+          html += '<span class="px-2.5 py-1 rounded-full text-xs font-bold ' + cat.badgeClass + '">' + cat.name + '</span>';
+          html += '<span class="px-2.5 py-0.5 rounded-full text-xs ' + status.class + '">' + status.name + '</span>';
+          html += '</div>';
+        }
+
+        html += '<div class="p-5 flex-1 flex flex-col justify-between">';
+        html += '<div>';
+        html += '<div class="flex items-center gap-2 text-xs text-slate-500 mb-2"><span class="flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> ' + escapeHtml(article.date) + '</span><span>·</span><span>작성: ' + escapeHtml(article.authorName) + '</span></div>';
+        html += '<h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 mb-1">' + escapeHtml(article.title) + '</h3>';
+        if (article.subtitle) {
+          html += '<p class="text-xs text-slate-500 font-medium line-clamp-1 mb-2">' + escapeHtml(article.subtitle) + '</p>';
+        }
+        html += '<p class="text-xs sm:text-sm text-slate-600 line-clamp-3 leading-relaxed mb-4">' + escapeHtml(article.content) + '</p>';
+        html += '</div>';
+
+        html += '<div>';
+        if (article.tags && article.tags.length > 0) {
+          html += '<div class="flex flex-wrap gap-1 mb-3">';
+          article.tags.slice(0, 3).forEach(function(t) { html += '<span class="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md font-normal">' + escapeHtml(t) + '</span>'; });
+          if (article.tags.length > 3) html += '<span class="text-xs text-slate-400 self-center">+' + (article.tags.length - 3) + '</span>';
+          html += '</div>';
+        }
+        html += '<div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">';
+        html += '<span>대상: ' + escapeHtml(article.targetGrade) + '</span>';
+        html += '<span class="text-blue-600 font-semibold flex items-center gap-0.5 group-hover:translate-x-1 transition-transform">상세보기 / 수정 <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></span>';
+        html += '</div></div></div></article>';
+      });
+
+      container.innerHTML = html;
+      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
+    }
+
+    window.openArticleModal = function(articleId) {
+      var article = state.articles.find(function(a) { return a.id === articleId; });
+      if (!article) return;
+      state.selectedArticleForModal = article;
+
+      var modal = document.getElementById('articleModal');
+      var modalContent = document.getElementById('articleModalBody');
+      var cat = CATEGORIES[article.category] || { name: '기타', badgeClass: 'badge-club' };
+      var status = STATUS_LABELS[article.status] || { name: '접수완료', class: 'status-submitted' };
+
+      var html = '<div class="p-6 sm:p-8 max-w-4xl mx-auto">';
+      html += '<div class="flex flex-wrap items-center justify-between gap-3 mb-4">';
+      html += '<div class="flex items-center gap-2"><span class="px-3 py-1 rounded-full text-xs font-semibold ' + cat.badgeClass + '">' + cat.name + '</span>';
+      html += '<span class="px-3 py-1 rounded-full text-xs ' + status.class + '">' + status.name + '</span></div>';
+      html += '<div class="text-xs text-slate-400 flex items-center gap-3"><span>접수일: ' + article.createdAt + '</span><span>원고 ID: ' + article.id + '</span></div>';
+      html += '</div>';
+
+      html += '<h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight mb-2">' + escapeHtml(article.title) + '</h2>';
+      if (article.subtitle) html += '<p class="text-base text-slate-600 font-medium mb-6">' + escapeHtml(article.subtitle) + '</p>';
+
+      html += '<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 mb-6 text-xs text-slate-700">';
+      html += '<div><span class="text-slate-400 block mb-0.5">활동 기간/일시</span><span class="font-bold text-slate-900">' + escapeHtml(article.date) + '</span></div>';
+      html += '<div><span class="text-slate-400 block mb-0.5">참여 대상/학년</span><span class="font-bold text-slate-900">' + escapeHtml(article.targetGrade) + '</span></div>';
+      html += '<div><span class="text-slate-400 block mb-0.5">작성자 (성명)</span><span class="font-bold text-slate-900">' + escapeHtml(article.authorName) + '</span></div>';
+      html += '</div>';
+
+      if (article.photos && article.photos.length > 0) {
+        html += '<div class="mb-8"><h4 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-1.5"><i data-lucide="camera" class="w-4 h-4 text-blue-600"></i> 활동 기록 사진 (' + article.photos.length + '장)</h4>';
+        html += '<div class="grid grid-cols-1 ' + (article.photos.length > 1 ? 'sm:grid-cols-2' : '') + ' gap-4">';
+        article.photos.forEach(function(p) {
+          html += '<div class="rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 flex flex-col">';
+          html += '<img src="' + p.url + '" class="w-full h-64 object-cover">';
+          if (p.caption) html += '<div class="p-2.5 bg-slate-50 text-xs text-slate-600 border-t border-slate-200 flex items-start gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 text-blue-500 shrink-0 mt-0.5"></i><span>' + escapeHtml(p.caption) + '</span></div>';
+          html += '</div>';
+        });
+        html += '</div></div>';
+      }
+
+      html += '<div class="mb-6"><h4 class="text-sm font-bold text-slate-900 mb-2">활동 내용</h4>';
+      html += '<div class="prose prose-slate max-w-none text-slate-800 leading-relaxed text-sm sm:text-base whitespace-pre-line p-4 bg-slate-50/70 rounded-2xl border border-slate-100">' + escapeHtml(article.content) + '</div></div>';
+
+      if (article.tags && article.tags.length > 0) {
+        html += '<div class="flex flex-wrap gap-1.5 pt-2 mb-6">';
+        article.tags.forEach(function(t) { html += '<span class="text-xs px-2.5 py-1 bg-blue-50 text-blue-700 font-medium rounded-full">' + escapeHtml(t) + '</span>'; });
+        html += '</div>';
+      }
+
+      html += '<div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-200">';
+      html += '<div class="flex items-center gap-2">';
+      html += '<button type="button" onclick="startEditArticle(\'' + article.id + '\')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow"><i data-lucide="edit-3" class="w-4 h-4"></i> 원고 수정하기</button>';
+      html += '<button type="button" onclick="deleteArticle(\'' + article.id + '\')" class="px-3.5 py-2.5 text-rose-600 hover:bg-rose-50 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1 transition"><i data-lucide="trash-2" class="w-4 h-4"></i> 원고 삭제</button>';
+      html += '</div>';
+      html += '<button type="button" onclick="closeModal()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl text-xs sm:text-sm font-semibold">닫기</button>';
+      html += '</div></div>';
+
+      modalContent.innerHTML = html;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
+    };
+
+    window.closeModal = function() {
+      var modal = document.getElementById('articleModal');
+      if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+    };
+
+    window.deleteArticle = function(articleId) {
+      if (!confirm('정말로 이 원고를 삭제하시겠습니까? (삭제 후 복구할 수 없습니다)')) return;
+      state.articles = state.articles.filter(function(a) { return a.id !== articleId; });
+      saveArticles();
+      closeModal();
+      renderCurrentTab();
+      showToast('원고가 삭제되었습니다.', 'info');
+    };
+
+    function renderAdminTable() {
+      var tbody = document.getElementById('adminTableBody');
+      if (!tbody) return;
+      if (state.articles.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="py-12 text-center text-slate-400 font-medium">접수된 원고가 없습니다.</td></tr>';
+        return;
+      }
+
+      var html = '';
+      state.articles.forEach(function(article, idx) {
+        var cat = CATEGORIES[article.category] || { name: '기타', badgeClass: 'badge-club' };
+        var coverPhoto = (article.photos && article.photos.find(function(p) { return p.isCover; })) || (article.photos && article.photos[0]) || {};
+
+        html += '<tr class="border-b border-slate-100 hover:bg-slate-50/70 transition-colors">';
+        html += '<td class="px-4 py-3 text-xs font-mono text-slate-500">' + (idx + 1) + '</td>';
+        html += '<td class="px-4 py-3"><div class="flex items-center gap-3">';
+        if (coverPhoto.url) {
+          html += '<img src="' + coverPhoto.url + '" class="w-12 h-10 object-cover rounded-lg border border-slate-200">';
+        } else {
+          html += '<div class="w-12 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 text-xs font-bold">무사진</div>';
+        }
+        html += '<div><div class="font-bold text-sm text-slate-900 hover:text-blue-600 cursor-pointer" onclick="openArticleModal(\'' + article.id + '\')">' + escapeHtml(article.title) + '</div>';
+        html += '<div class="text-xs text-slate-400 flex items-center gap-2 mt-0.5"><span>사진 ' + (article.photos ? article.photos.length : 0) + '장</span><span>·</span><span>' + escapeHtml(article.targetGrade) + '</span></div></div></div></td>';
+        html += '<td class="px-4 py-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ' + cat.badgeClass + '">' + cat.name + '</span></td>';
+        html += '<td class="px-4 py-3 text-xs font-bold text-slate-800">' + escapeHtml(article.authorName) + '</td>';
+        html += '<td class="px-4 py-3 text-xs text-slate-500 font-mono">' + article.createdAt + '</td>';
+        html += '<td class="px-4 py-3"><select onchange="updateArticleStatus(\'' + article.id + '\', this.value)" class="text-xs font-bold px-2 py-1 rounded-lg border focus:ring-1 focus:ring-blue-500 bg-white">';
+        html += '<option value="submitted" ' + (article.status === 'submitted' ? 'selected' : '') + '>접수완료</option>';
+        html += '<option value="reviewing" ' + (article.status === 'reviewing' ? 'selected' : '') + '>검토중</option>';
+        html += '<option value="confirmed" ' + (article.status === 'confirmed' ? 'selected' : '') + '>수록확정</option>';
+        html += '<option value="revision" ' + (article.status === 'revision' ? 'selected' : '') + '>보완요청</option>';
+        html += '</select></td>';
+        html += '<td class="px-4 py-3 text-xs text-right space-x-1">';
+        html += '<button type="button" onclick="startEditArticle(\'' + article.id + '\')" title="원고 수정" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"><i data-lucide="edit-3" class="w-4 h-4"></i></button>';
+        html += '<button type="button" onclick="openArticleModal(\'' + article.id + '\')" title="상세보기" class="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition"><i data-lucide="eye" class="w-4 h-4"></i></button>';
+        html += '<button type="button" onclick="deleteArticle(\'' + article.id + '\')" title="삭제" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>';
+        html += '</td></tr>';
+      });
+
+      tbody.innerHTML = html;
+      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
+    }
+
+    window.updateArticleStatus = function(articleId, newStatus) {
+      var article = state.articles.find(function(a) { return a.id === articleId; });
+      if (article) {
+        article.status = newStatus;
+        saveArticles();
+        showToast('원고 상태가 ' + (STATUS_LABELS[newStatus] ? STATUS_LABELS[newStatus].name : newStatus) + '(으)로 변경되었습니다.', 'success');
+      }
+    };
+
+    function updateStats() {
+      var total = state.articles.length;
+      var confirmed = state.articles.filter(function(a) { return a.status === 'confirmed'; }).length;
+      var clubCount = state.articles.filter(function(a) { return a.category === 'club'; }).length;
+      var curriculumCount = state.articles.filter(function(a) { return a.category === 'curriculum'; }).length;
+
+      var statTotal = document.getElementById('statTotalArticles');
+      var statConfirmed = document.getElementById('statConfirmedArticles');
+      var statClubs = document.getElementById('statClubs');
+      var statCurriculum = document.getElementById('statCurriculum');
+
+      if (statTotal) statTotal.textContent = total;
+      if (statConfirmed) statConfirmed.textContent = confirmed;
+      if (statClubs) statClubs.textContent = clubCount;
+      if (statCurriculum) statCurriculum.textContent = curriculumCount;
+    }
+
+    window.exportToCsv = function() {
+      if (state.articles.length === 0) { showToast('내보낼 원고 데이터가 없습니다.', 'warning'); return; }
+      var headers = ['원고ID', '구분', '제목', '부제목', '활동기간', '대상학년_인원', '작성자성명', '수록상태', '사진수', '활동내용', '접수일'];
+      var rows = state.articles.map(function(a) {
+        return [
+          '\"' + a.id + '\"', '\"' + (a.categoryName || '') + '\"',
+          '\"' + (a.title || '').replace(/\"/g, '\"\"') + '\"',
+          '\"' + (a.subtitle || '').replace(/\"/g, '\"\"') + '\"',
+          '\"' + (a.date || '') + '\"',
+          '\"' + (a.targetGrade || '') + '\"',
+          '\"' + (a.authorName || '') + '\"',
+          '\"' + (STATUS_LABELS[a.status] ? STATUS_LABELS[a.status].name : a.status) + '\"',
+          '\"' + (a.photos ? a.photos.length : 0) + '\"',
+          '\"' + (a.content || '').replace(/\"/g, '\"\"') + '\"',
+          '\"' + a.createdAt + '\"'
+        ];
+      });
+      var csvContent = '\uFEFF' + [headers.join(','), ...rows.map(function(r) { return r.join(','); })].join('\r\n');
+      var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', '2026_오현중학교_교지원고목록_' + new Date().toISOString().split('T')[0] + '.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('📊 엑셀(CSV) 파일이 다운로드되었습니다.', 'success');
+    };
+
+    window.exportToJson = function() {
+      var jsonStr = JSON.stringify(state.articles, null, 2);
+      var blob = new Blob([jsonStr], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', '오현중_교지데이터_백업_' + new Date().toISOString().split('T')[0] + '.json');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('💾 JSON 백업 파일이 저장되었습니다.', 'success');
+    };
+
+    window.importFromJson = function(event) {
+      var file = event.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          var imported = JSON.parse(e.target.result);
+          if (Array.isArray(imported)) {
+            if (confirm('불러온 백업 파일에서 ' + imported.length + '건의 원고를 발견했습니다. 기존 목록에 복원하시겠습니까?')) {
+              state.articles = imported;
+              saveArticles();
+              renderCurrentTab();
+              showToast('✅ ' + imported.length + '건의 원고 데이터를 성공적으로 복원했습니다.', 'success');
+            }
+          } else { showToast('올바른 교지 백업 JSON 형식이 아닙니다.', 'error'); }
+        } catch (err) { showToast('JSON 파싱 오류가 발생했습니다.', 'error'); }
+      };
+      reader.readAsText(file);
+    };
+
+    function showToast(message, type) {
+      type = type || 'info';
+      var toastContainer = document.getElementById('toastContainer');
+      if (!toastContainer) return;
+      var bgColors = { success: 'bg-emerald-600 text-white', error: 'bg-rose-600 text-white', warning: 'bg-amber-500 text-white', info: 'bg-blue-600 text-white' };
+      var icons = { success: 'check-circle', error: 'alert-circle', warning: 'alert-triangle', info: 'info' };
+
+      var toast = document.createElement('div');
+      toast.className = (bgColors[type] || bgColors.info) + ' px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 text-xs sm:text-sm font-bold transition-all duration-300 transform translate-y-2 opacity-0 max-w-md pointer-events-auto';
+      toast.innerHTML = '<i data-lucide="' + (icons[type] || 'info') + '" class="w-4 h-4 shrink-0"></i><span>' + escapeHtml(message) + '</span>';
+      toastContainer.appendChild(toast);
+      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
+
+      requestAnimationFrame(function() { toast.classList.remove('translate-y-2', 'opacity-0'); });
+      setTimeout(function() {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(function() { toast.remove(); }, 300);
+      }, 3500);
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
