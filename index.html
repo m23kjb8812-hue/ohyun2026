@@ -1008,6 +1008,64 @@
     };
 
     // ==========================================
+    // 🪟 통합 모달 제어 시스템 (팝업 완벽 닫힘 보장)
+    // ==========================================
+    var ALL_MODAL_IDS = ['adminAuthModal', 'articleAuthModal', 'findMyArticleModal', 'changePwModal', 'cloudConfigModal', 'articleModal'];
+
+    window.closeAllModals = function() {
+      ALL_MODAL_IDS.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+          el.classList.add('hidden');
+          el.classList.remove('flex');
+          el.style.display = 'none';
+        }
+      });
+      document.body.style.overflow = '';
+    };
+
+    window.openModalById = function(id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.classList.remove('hidden');
+        el.classList.add('flex');
+        el.style.display = 'flex';
+      }
+      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
+    };
+
+    window.closeModalById = function(id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.classList.add('hidden');
+        el.classList.remove('flex');
+        el.style.display = 'none';
+      }
+    };
+
+    window.closeAdminAuthModal = function() {
+      closeModalById('adminAuthModal');
+      state.pendingTabTarget = null;
+    };
+
+    window.openAdminAuthModal = function() {
+      openModalById('adminAuthModal');
+      var input = document.getElementById('adminPasswordInput');
+      if (input) {
+        input.value = '';
+        setTimeout(function() { input.focus(); }, 100);
+      }
+    };
+
+    window.openChangePasswordModal = function() {
+      openModalById('changePwModal');
+    };
+
+    window.closeChangePasswordModal = function() {
+      closeModalById('changePwModal');
+    };
+
+    // ==========================================
     // 🔒 개별 원고 수정/삭제 비밀번호 검증
     // ==========================================
     window.verifyAndEditArticle = function(articleId) {
@@ -1015,6 +1073,7 @@
       if (!article) return;
 
       if (state.isAdmin) {
+        closeAllModals();
         startEditArticle(articleId);
         return;
       }
@@ -1037,24 +1096,18 @@
     };
 
     function openArticleAuthModal(title) {
-      var modal = document.getElementById('articleAuthModal');
       var titleText = document.getElementById('authTargetTitleText');
       var input = document.getElementById('articlePasswordInput');
       if (titleText) titleText.textContent = title;
-      if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-      }
+      openModalById('articleAuthModal');
       if (input) {
         input.value = '';
         setTimeout(function() { input.focus(); }, 100);
       }
-      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
     }
 
     window.closeArticleAuthModal = function() {
-      var modal = document.getElementById('articleAuthModal');
-      if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+      closeModalById('articleAuthModal');
       state.authActionTarget = null;
     };
 
@@ -1067,7 +1120,7 @@
       var article = state.articles.find(function(a) { return a.id === state.authActionTarget.articleId; });
 
       if (!article) {
-        closeArticleAuthModal();
+        closeAllModals();
         return;
       }
 
@@ -1078,9 +1131,8 @@
       if (enteredPw === articlePw || enteredHash === storedAdminHash || enteredHash === DEFAULT_ADMIN_HASH || enteredHash === ALT_ADMIN_HASH) {
         var action = state.authActionTarget.action;
         var artId = state.authActionTarget.articleId;
-        closeArticleAuthModal();
-        closeFindMyArticleModal();
-        closeModal();
+        state.authActionTarget = null;
+        closeAllModals();
 
         if (action === 'edit') {
           startEditArticle(artId);
@@ -1590,8 +1642,9 @@
           html += '</div>';
         }
         html += '<div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">';
-        html += '<span>대상: ' + escapeHtml(article.targetGrade) + '</span>';
-        html += '<span class="text-blue-600 font-semibold flex items-center gap-0.5 group-hover:translate-x-1 transition-transform">상세보기 / 수정 <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></span>';
+        html += '<span class="font-medium">대상: ' + escapeHtml(article.targetGrade) + '</span>';
+        html += '<button type="button" onclick="event.stopPropagation(); openArticleModal(\'' + article.id + '\')" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold rounded-xl text-xs transition flex items-center gap-1 shadow-xs">';
+        html += '<i data-lucide="book-open" class="w-3.5 h-3.5"></i> 원고 전문 및 사진 보기</button>';
         html += '</div></div></div></article>';
       });
 
@@ -1631,16 +1684,20 @@
         html += '<div class="mb-8"><h4 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-1.5"><i data-lucide="camera" class="w-4 h-4 text-blue-600"></i> 활동 기록 사진 (' + article.photos.length + '장)</h4>';
         html += '<div class="grid grid-cols-1 ' + (article.photos.length > 1 ? 'sm:grid-cols-2' : '') + ' gap-4">';
         article.photos.forEach(function(p) {
-          html += '<div class="rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 flex flex-col">';
-          html += '<img src="' + p.url + '" class="w-full h-64 object-cover">';
-          if (p.caption) html += '<div class="p-2.5 bg-slate-50 text-xs text-slate-600 border-t border-slate-200 flex items-start gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 text-blue-500 shrink-0 mt-0.5"></i><span>' + escapeHtml(p.caption) + '</span></div>';
+          html += '<div class="rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 flex flex-col shadow-xs">';
+          html += '<img src="' + p.url + '" class="w-full h-64 object-cover hover:scale-102 transition-transform duration-300">';
+          if (p.caption) html += '<div class="p-3 bg-white text-xs font-medium text-slate-700 border-t border-slate-200 flex items-start gap-1.5"><i data-lucide="quote" class="w-3.5 h-3.5 text-blue-500 shrink-0 mt-0.5"></i><span>' + escapeHtml(p.caption) + '</span></div>';
           html += '</div>';
         });
         html += '</div></div>';
       }
 
-      html += '<div class="mb-6"><h4 class="text-sm font-bold text-slate-900 mb-2">활동 내용</h4>';
-      html += '<div class="prose prose-slate max-w-none text-slate-800 leading-relaxed text-sm sm:text-base whitespace-pre-line p-4 bg-slate-50/70 rounded-2xl border border-slate-100">' + escapeHtml(article.content) + '</div></div>';
+      html += '<div class="mb-6">';
+      html += '<div class="flex items-center justify-between mb-2">';
+      html += '<h4 class="text-sm font-bold text-slate-900 flex items-center gap-1.5"><i data-lucide="file-text" class="w-4 h-4 text-blue-600"></i> 교지 수록 원고 전문</h4>';
+      html += '<button type="button" onclick="copyArticleContentToClipboard()" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-bold flex items-center gap-1 transition"><i data-lucide="copy" class="w-3.5 h-3.5"></i> 원고 텍스트 복사</button>';
+      html += '</div>';
+      html += '<div id="articleModalContentText" class="prose prose-slate max-w-none text-slate-900 leading-loose text-sm sm:text-base whitespace-pre-line p-5 bg-slate-50/90 rounded-2xl border border-slate-200 font-normal">' + escapeHtml(article.content) + '</div></div>';
 
       if (article.tags && article.tags.length > 0) {
         html += '<div class="flex flex-wrap gap-1.5 pt-2 mb-6">';
@@ -1650,21 +1707,31 @@
 
       html += '<div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-200">';
       html += '<div class="flex items-center gap-2">';
-      html += '<button type="button" onclick="verifyAndEditArticle(\'' + article.id + '\')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow"><i data-lucide="edit-3" class="w-4 h-4"></i> 원고 수정하기</button>';
+      html += '<button type="button" onclick="verifyAndEditArticle(\'' + article.id + '\')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow transition"><i data-lucide="edit-3" class="w-4 h-4"></i> 원고 수정하기</button>';
       html += '<button type="button" onclick="verifyAndDeleteArticle(\'' + article.id + '\')" class="px-3.5 py-2.5 text-rose-600 hover:bg-rose-50 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1 transition"><i data-lucide="trash-2" class="w-4 h-4"></i> 원고 삭제</button>';
       html += '</div>';
       html += '<button type="button" onclick="closeModal()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl text-xs sm:text-sm font-semibold">닫기</button>';
       html += '</div></div>';
 
       modalContent.innerHTML = html;
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
+      openModalById('articleModal');
     };
 
     window.closeModal = function() {
-      var modal = document.getElementById('articleModal');
-      if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+      closeModalById('articleModal');
+    };
+
+    window.copyArticleContentToClipboard = function() {
+      if (state.selectedArticleForModal) {
+        var text = '【' + (state.selectedArticleForModal.categoryName || '원고') + '】 ' + state.selectedArticleForModal.title + '\n' +
+          '작성자: ' + state.selectedArticleForModal.authorName + ' (' + state.selectedArticleForModal.targetGrade + ')\n\n' +
+          state.selectedArticleForModal.content;
+        navigator.clipboard.writeText(text).then(function() {
+          showToast('📋 원고 텍스트가 클립보드에 복사되었습니다. 한글(HWP) 등에 붙여넣기 하실 수 있습니다.', 'success');
+        }).catch(function() {
+          showToast('텍스트 복사에 실패했습니다.', 'error');
+        });
+      }
     };
 
     window.deleteArticle = function(articleId) {
