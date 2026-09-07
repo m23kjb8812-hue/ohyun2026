@@ -1245,30 +1245,34 @@
 
     function saveArticleToCentral(article) {
       saveArticlesLocalOnly();
+      var promises = [];
 
       // 1. Sync to Firebase Cloud Firestore (if initialized)
       if (state.db) {
         try {
-          state.db.collection('ohyun2026_articles').doc(article.id).set(article, { merge: true })
+          var p = state.db.collection('ohyun2026_articles').doc(article.id).set(article, { merge: true })
             .then(function() {
               updateCloudStatus(true);
-              showToast('☁️ 구글 클라우드 DB에 실시간 저장 완료!', 'success');
             })
             .catch(function(err) {
               console.warn('Firestore set error:', err);
-              showToast('⚠️ 클라우드 저장 실패: ' + (err.message || '용량 초과 또는 권한 오류'), 'error');
+              throw err;
             });
+          promises.push(p);
         } catch (e) {
           console.warn('Firestore exception:', e);
         }
       }
 
       // 2. Sync to local backend server
-      fetch('/api/articles', {
+      var localFetch = fetch('/api/articles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(article)
       }).catch(function() {});
+      promises.push(localFetch);
+
+      return Promise.all(promises);
     }
 
     function deleteArticleFromCentral(articleId) {
@@ -1339,7 +1343,7 @@
 
     window.handleImageFiles = function(files) {
       var allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
-      var maxDim = 900;
+      var maxDim = 850;
       Array.from(files).forEach(function(file) {
         if (!allowed.includes(file.type)) {
           showToast(file.name + '은(는) 지원되지 않는 이미지 형식입니다.', 'error');
@@ -1359,7 +1363,7 @@
             canvas.getContext('2d').drawImage(img, 0, 0, w, h);
             var isCover = state.uploadedPhotos.length === 0;
             state.uploadedPhotos.push({
-              url: canvas.toDataURL('image/jpeg', 0.72),
+              url: canvas.toDataURL('image/jpeg', 0.68),
               caption: '',
               isCover: isCover,
               name: file.name
@@ -1420,9 +1424,9 @@
     };
 
     // ==========================================
-    // 📝 원고 등록 & 수정 폼 제출
+    // 📝 원고 등록 & 수정 폼 제출 (비동기 클라우드 검증)
     // ==========================================
-    window.handleFormSubmit = function(e) {
+    window.handleFormSubmit = async function(e) {
       if (e && e.preventDefault) e.preventDefault();
       var title = document.getElementById('articleTitle').value.trim();
       var subtitle = document.getElementById('articleSubtitle').value.trim();
@@ -1447,10 +1451,40 @@
 
       var photos = state.uploadedPhotos.slice();
 
-      if (state.editingArticleId) {
-        var existingIndex = state.articles.findIndex(function(a) { return a.id === state.editingArticleId; });
-        if (existingIndex !== -1) {
-          var updated = Object.assign({}, state.articles[existingIndex], {
+      var submitBtn = document.querySelector('#magazineSubmitForm button[type="submit"]');
+      var submitBtnText = document.getElementById('submitBtnText');
+      var originalText = submitBtnText ? submitBtnText.textContent : '원고 및 사진 접수하기';
+
+      if (submitBtn) submitBtn.disabled = true;
+      if (submitBtnText) submitBtnText.textContent = '☁️ 구글 클라우드로 전송 중...';
+
+      try {
+        if (state.editingArticleId) {
+          var existingIndex = state.articles.findIndex(function(a) { return a.id === state.editingArticleId; });
+          if (existingIndex !== -1) {
+            var updated = Object.assign({}, state.articles[existingIndex], {
+              title: title,
+              subtitle: subtitle,
+              category: category,
+              categoryName: CATEGORIES[category] ? CATEGORIES[category].name : '기타',
+              date: date || '2026학년도 연중',
+              targetGrade: targetGrade || '해당 학생',
+              authorName: authorName,
+              visibility: visibility,
+              password: articlePassword,
+              content: content,
+              tags: tags,
+              photos: photos,
+              updatedAt: new Date().toISOString().split('T')[0]
+            });
+            state.articles[existingIndex] = updated;
+            await saveArticleToCentral(updated);
+            showToast('✅ 원고가 구글 클라우드에 성공적으로 수정되었습니다.', 'success');
+          }
+          cancelEdit();
+        } else {
+          var newArticle = {
+            id: 'ohyun-2026-' + Date.now().toString().slice(-4),
             title: title,
             subtitle: subtitle,
             category: category,
@@ -1460,44 +1494,30 @@
             authorName: authorName,
             visibility: visibility,
             password: articlePassword,
+            status: 'submitted',
+            createdAt: new Date().toISOString().split('T')[0],
             content: content,
             tags: tags,
-            photos: photos,
-            updatedAt: new Date().toISOString().split('T')[0]
-          });
-          state.articles[existingIndex] = updated;
-          saveArticleToCentral(updated);
-          showToast('✅ 원고가 성공적으로 수정되었습니다.', 'success');
+            photos: photos
+          };
+
+          state.articles.unshift(newArticle);
+          await saveArticleToCentral(newArticle);
+          showToast('🎉 원고와 사진이 구글 클라우드에 100% 정상 접수되었습니다! (' + (visibility === 'private' ? '비공개 저장' : '공개 저장') + ')', 'success');
+          resetForm();
         }
-        cancelEdit();
-      } else {
-        var newArticle = {
-          id: 'ohyun-2026-' + Date.now().toString().slice(-4),
-          title: title,
-          subtitle: subtitle,
-          category: category,
-          categoryName: CATEGORIES[category] ? CATEGORIES[category].name : '기타',
-          date: date || '2026학년도 연중',
-          targetGrade: targetGrade || '해당 학생',
-          authorName: authorName,
-          visibility: visibility,
-          password: articlePassword,
-          status: 'submitted',
-          createdAt: new Date().toISOString().split('T')[0],
-          content: content,
-          tags: tags,
-          photos: photos
-        };
 
-        state.articles.unshift(newArticle);
-        saveArticleToCentral(newArticle);
-        resetForm();
-        showToast('🎉 원고와 사진이 성공적으로 접수되었습니다! (' + (visibility === 'private' ? '비공개 저장' : '공개 저장') + ')', 'success');
-      }
-
-      updateStats();
-      if (state.isAdmin) {
-        setTimeout(function() { switchTab('gallery'); }, 600);
+        updateStats();
+        if (state.isAdmin) {
+          setTimeout(function() { switchTab('gallery'); }, 600);
+        }
+      } catch (err) {
+        console.error('Submit error:', err);
+        alert('⚠️ 클라우드 전송 실패: ' + (err.message || '네트워크 오류') + '\n\n작성하신 원고 내용은 안전하게 보존되어 있으니 다시 한번 [접수하기]를 눌러주세요.');
+        showToast('전송 실패: ' + err.message, 'error');
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+        if (submitBtnText) submitBtnText.textContent = originalText;
       }
     };
 
