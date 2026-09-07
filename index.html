@@ -1249,10 +1249,18 @@
       // 1. Sync to Firebase Cloud Firestore (if initialized)
       if (state.db) {
         try {
-          state.db.collection('ohyun2026_articles').doc(article.id).set(article, { merge: true }).catch(function(err) {
-            console.warn('Firestore set error:', err);
-          });
-        } catch (e) {}
+          state.db.collection('ohyun2026_articles').doc(article.id).set(article, { merge: true })
+            .then(function() {
+              updateCloudStatus(true);
+              showToast('☁️ 구글 클라우드 DB에 실시간 저장 완료!', 'success');
+            })
+            .catch(function(err) {
+              console.warn('Firestore set error:', err);
+              showToast('⚠️ 클라우드 저장 실패: ' + (err.message || '용량 초과 또는 권한 오류'), 'error');
+            });
+        } catch (e) {
+          console.warn('Firestore exception:', e);
+        }
       }
 
       // 2. Sync to local backend server
@@ -1279,7 +1287,7 @@
     }
 
     // ==========================================
-    // 📂 드롭존 및 이미지 업로드
+    // 📂 드롭존 및 이미지 업로드 (클라우드 용량 최적화)
     // ==========================================
     function initDropZone() {
       var dropZone = document.getElementById('photoDropZone');
@@ -1331,7 +1339,7 @@
 
     window.handleImageFiles = function(files) {
       var allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
-      var maxDim = 1200;
+      var maxDim = 900;
       Array.from(files).forEach(function(file) {
         if (!allowed.includes(file.type)) {
           showToast(file.name + '은(는) 지원되지 않는 이미지 형식입니다.', 'error');
@@ -1351,7 +1359,7 @@
             canvas.getContext('2d').drawImage(img, 0, 0, w, h);
             var isCover = state.uploadedPhotos.length === 0;
             state.uploadedPhotos.push({
-              url: canvas.toDataURL('image/jpeg', 0.8),
+              url: canvas.toDataURL('image/jpeg', 0.72),
               caption: '',
               isCover: isCover,
               name: file.name
