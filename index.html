@@ -257,13 +257,13 @@
             </div>
           </div>
 
-          <!-- 2단계: 사진 첨부 (필수 요구사항 충족) -->
+          <!-- 2단계: 사진 첨부 (최대 4장) -->
           <div class="space-y-4 pt-4 border-t border-slate-100">
             <div class="flex items-center justify-between">
               <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2 border-l-4 border-blue-600 pl-2.5">
-                2. 사진 첨부 <span class="text-rose-500">* (필수)</span>
+                2. 사진 첨부 <span class="text-rose-500">* (최대 4장까지)</span>
               </h3>
-              <span class="text-xs text-slate-500">다중 업로드 지원 / 사진별 캡션 입력 가능</span>
+              <span class="text-xs text-blue-700 font-bold bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200">📸 최대 4장까지 첨부 가능</span>
             </div>
 
             <!-- 파일 드롭존 -->
@@ -274,10 +274,10 @@
                 <i data-lucide="image-plus" class="w-6 h-6"></i>
               </div>
               <p class="text-sm font-bold text-slate-700">
-                사진을 이곳으로 드래그하거나 <span class="text-blue-600 underline">클릭하여 선택</span>하세요
+                사진을 이곳으로 드래그하거나 <span class="text-blue-600 underline">클릭하여 선택</span>하세요 (최대 4장)
               </p>
-              <p class="text-xs text-slate-400 mt-1">
-                JPG, PNG, WebP 등 이미지 파일 (여러 장 동시 선택 가능)
+              <p class="text-xs text-slate-500 mt-1">
+                JPG, PNG, WebP 등 이미지 파일 (교지 수록용 대표 활동 사진 <strong class="text-blue-600 font-bold">1~4장</strong> 첨부)
               </p>
             </div>
 
@@ -1341,10 +1341,27 @@
       else if (state.activeTab === 'admin') renderAdminTable();
     }
 
+    var MAX_PHOTOS = 4;
+
     window.handleImageFiles = function(files) {
       var allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
       var maxDim = 850;
-      Array.from(files).forEach(function(file) {
+
+      if (state.uploadedPhotos.length >= MAX_PHOTOS) {
+        showToast('⚠️ 사진은 최대 ' + MAX_PHOTOS + '장까지만 첨부할 수 있습니다.', 'warning');
+        return;
+      }
+
+      var fileArray = Array.from(files);
+      var currentCount = state.uploadedPhotos.length;
+      var availableSlots = MAX_PHOTOS - currentCount;
+
+      if (fileArray.length > availableSlots) {
+        showToast('⚠️ 사진은 최대 4장까지만 첨부 가능하여 ' + availableSlots + '장만 추가됩니다.', 'warning');
+        fileArray = fileArray.slice(0, availableSlots);
+      }
+
+      fileArray.forEach(function(file) {
         if (!allowed.includes(file.type)) {
           showToast(file.name + '은(는) 지원되지 않는 이미지 형식입니다.', 'error');
           return;
@@ -1361,6 +1378,9 @@
             var canvas = document.createElement('canvas');
             canvas.width = w; canvas.height = h;
             canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            
+            if (state.uploadedPhotos.length >= MAX_PHOTOS) return;
+
             var isCover = state.uploadedPhotos.length === 0;
             state.uploadedPhotos.push({
               url: canvas.toDataURL('image/jpeg', 0.68),
@@ -1381,10 +1401,16 @@
       if (!container) return;
       if (state.uploadedPhotos.length === 0) { container.innerHTML = ''; return; }
 
+      var count = state.uploadedPhotos.length;
       var html = '<div class="mb-2 text-sm font-semibold text-slate-700 flex items-center justify-between">';
-      html += '<span>첨부된 사진 (' + state.uploadedPhotos.length + '장) - 사진별 설명(캡션)을 입력해주세요</span>';
-      html += '<span class="text-xs text-blue-600 font-medium">★ 대표 사진 지정 가능</span></div>';
-      html += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">';
+      html += '<span>첨부된 사진 (<strong class="text-blue-600 font-black">' + count + '</strong> / 4장) - 사진별 설명(캡션)을 입력해주세요</span>';
+      if (count >= 4) {
+        html += '<span class="text-xs text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">✅ 최대 4장 첨부 완료</span>';
+      } else {
+        html += '<span class="text-xs text-blue-600 font-medium">★ 대표 사진 지정 가능 (최대 4장)</span>';
+      }
+      html += '</div>';
+      html += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">';
 
       state.uploadedPhotos.forEach(function(photo, idx) {
         html += '<div class="border rounded-xl p-3 bg-slate-50 relative ' + (photo.isCover ? 'ring-2 ring-blue-500 bg-blue-50/40' : '') + '">';
@@ -1450,6 +1476,10 @@
         : ['#' + (CATEGORIES[category] ? CATEGORIES[category].name : '오현중')];
 
       var photos = state.uploadedPhotos.slice();
+      if (photos.length > 4) {
+        showToast('사진은 최대 4장까지만 첨부할 수 있습니다.', 'warning');
+        return;
+      }
 
       var submitBtn = document.querySelector('#magazineSubmitForm button[type="submit"]');
       var submitBtnText = document.getElementById('submitBtnText');
