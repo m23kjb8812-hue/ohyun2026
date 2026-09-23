@@ -1862,6 +1862,8 @@
           html += '</div>';
         });
         html += '</div></div>';
+      }
+
       if (article.attachment) {
         var attSize = (article.attachment.size / 1024).toFixed(1) + ' KB';
         if (article.attachment.size > 1024 * 1024) attSize = (article.attachment.size / (1024 * 1024)).toFixed(2) + ' MB';
