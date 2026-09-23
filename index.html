@@ -315,10 +315,38 @@
             </div>
           </div>
 
-          <!-- 4단계: 작성자 정보, 공개 여부 및 비밀번호 -->
+          <!-- 4단계: 한글(HWP/HWPX/PDF) 파일 첨부 (선택) -->
+          <div class="space-y-4 pt-4 border-t border-slate-100">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2 border-l-4 border-amber-500 pl-2.5">
+                4. 한글(HWP) 파일 첨부 <span class="text-slate-400 font-normal text-xs">(선택)</span>
+              </h3>
+              <span class="text-xs text-amber-800 font-bold bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">📄 .hwp, .hwpx, .pdf 지원 (권장 2MB 이내)</span>
+            </div>
+
+            <!-- 파일 선택 박스 -->
+            <div id="hwpDropZone" onclick="document.getElementById('hwpFileInput').click()"
+              class="border-2 border-dashed border-slate-300 hover:border-amber-500 bg-slate-50/70 hover:bg-amber-50/30 rounded-2xl p-5 text-center cursor-pointer transition-all duration-200 group">
+              <input type="file" id="hwpFileInput" accept=".hwp,.hwpx,.pdf,.docx,.doc" class="hidden" onchange="if(this.files&&this.files.length) handleHwpFile(this.files[0])">
+              <div class="w-10 h-10 mx-auto rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i data-lucide="file-text" class="w-5 h-5"></i>
+              </div>
+              <p class="text-xs sm:text-sm font-bold text-slate-700">
+                작성해두신 한글(HWP) 원고 파일이 있다면 <span class="text-amber-700 underline">클릭하여 첨부</span>하세요
+              </p>
+              <p class="text-[11px] text-slate-400 mt-1">
+                한글 파일을 첨부하시면 교지 편집위원회에서 원본 서식을 다운로드하여 편집에 활용합니다.
+              </p>
+            </div>
+
+            <!-- 첨부된 한글 파일 표시 박스 -->
+            <div id="attachedHwpFileContainer" class="hidden"></div>
+          </div>
+
+          <!-- 5단계: 작성자 정보, 공개 여부 및 비밀번호 -->
           <div class="space-y-4 pt-4 border-t border-slate-100">
             <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2 border-l-4 border-blue-600 pl-2.5">
-              4. 작성자 정보 및 보안 설정
+              5. 작성자 정보 및 보안 설정
             </h3>
             
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -756,6 +784,7 @@
       filterCategory: 'all',
       searchQuery: '',
       uploadedPhotos: [],
+      attachedFile: null,
       selectedArticleForModal: null,
       editingArticleId: null,
       isAdmin: false,
@@ -1450,6 +1479,82 @@
     };
 
     // ==========================================
+    // 📄 한글(HWP) 및 문서 파일 첨부 처리
+    // ==========================================
+    window.handleHwpFile = function(file) {
+      if (!file) return;
+      var maxBytes = 2 * 1024 * 1024; // 2MB
+      if (file.size > maxBytes) {
+        alert('⚠️ 첨부 파일 용량 초과 (' + (file.size / (1024 * 1024)).toFixed(1) + 'MB)\n\n구글 클라우드 전송을 위해 한글(HWP) 파일은 2MB 이하로 첨부해주세요.\n(사진이 다수 포함된 경우 사진은 2단계 사진 첨부란에 따로 올리시고 텍스트 위주로 저장해주세요.)');
+        var input = document.getElementById('hwpFileInput');
+        if (input) input.value = '';
+        return;
+      }
+
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        state.attachedFile = {
+          name: file.name,
+          size: file.size,
+          data: e.target.result,
+          type: file.type || 'application/octet-stream'
+        };
+        renderAttachedHwpFile();
+        showToast('📄 ' + file.name + ' 파일이 첨부되었습니다.', 'success');
+      };
+      reader.readAsDataURL(file);
+    };
+
+    window.removeHwpFile = function() {
+      state.attachedFile = null;
+      var input = document.getElementById('hwpFileInput');
+      if (input) input.value = '';
+      renderAttachedHwpFile();
+      showToast('첨부 파일이 삭제되었습니다.', 'info');
+    };
+
+    function renderAttachedHwpFile() {
+      var container = document.getElementById('attachedHwpFileContainer');
+      var dropZone = document.getElementById('hwpDropZone');
+      if (!container) return;
+
+      if (state.attachedFile) {
+        var sizeFormatted = (state.attachedFile.size / 1024).toFixed(1) + ' KB';
+        if (state.attachedFile.size > 1024 * 1024) {
+          sizeFormatted = (state.attachedFile.size / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+        var ext = (state.attachedFile.name.split('.').pop() || 'HWP').toUpperCase();
+
+        container.innerHTML = '<div class="p-3.5 bg-amber-50 border border-amber-300 rounded-2xl flex items-center justify-between gap-3 shadow-xs">' +
+          '<div class="flex items-center gap-3 min-w-0">' +
+            '<div class="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-sm">' +
+              escapeHtml(ext) +
+            '</div>' +
+            '<div class="min-w-0">' +
+              '<div class="text-xs sm:text-sm font-bold text-slate-900 truncate">' + escapeHtml(state.attachedFile.name) + '</div>' +
+              '<div class="text-[11px] text-slate-500 flex items-center gap-2"><span>' + sizeFormatted + '</span><span>·</span><span class="text-emerald-600 font-bold">정상 첨부 완료</span></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="flex items-center gap-1.5 shrink-0">' +
+            '<a href="' + state.attachedFile.data + '" download="' + escapeHtml(state.attachedFile.name) + '" class="px-3 py-1.5 rounded-xl bg-white border border-amber-300 text-amber-900 hover:bg-amber-100 text-xs font-bold transition flex items-center gap-1 shadow-xs">' +
+              '<i data-lucide="download" class="w-3.5 h-3.5"></i> 다운로드' +
+            '</a>' +
+            '<button type="button" onclick="removeHwpFile()" class="p-2 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 transition shadow-xs" title="첨부 파일 삭제">' +
+              '<i data-lucide="trash-2" class="w-4 h-4"></i>' +
+            '</button>' +
+          '</div>' +
+        '</div>';
+        container.classList.remove('hidden');
+        if (dropZone) dropZone.classList.add('hidden');
+      } else {
+        container.innerHTML = '';
+        container.classList.add('hidden');
+        if (dropZone) dropZone.classList.remove('hidden');
+      }
+      try { if (window.lucide) window.lucide.createIcons(); } catch(e) {}
+    }
+
+    // ==========================================
     // 📝 원고 등록 & 수정 폼 제출 (비동기 클라우드 검증)
     // ==========================================
     window.handleFormSubmit = async function(e) {
@@ -1481,6 +1586,8 @@
         return;
       }
 
+      var attachment = state.attachedFile ? Object.assign({}, state.attachedFile) : null;
+
       var submitBtn = document.querySelector('#magazineSubmitForm button[type="submit"]');
       var submitBtnText = document.getElementById('submitBtnText');
       var originalText = submitBtnText ? submitBtnText.textContent : '원고 및 사진 접수하기';
@@ -1505,6 +1612,7 @@
               content: content,
               tags: tags,
               photos: photos,
+              attachment: attachment,
               updatedAt: new Date().toISOString().split('T')[0]
             });
             state.articles[existingIndex] = updated;
@@ -1528,7 +1636,8 @@
             createdAt: new Date().toISOString().split('T')[0],
             content: content,
             tags: tags,
-            photos: photos
+            photos: photos,
+            attachment: attachment
           };
 
           state.articles.unshift(newArticle);
@@ -1555,6 +1664,8 @@
       document.getElementById('magazineSubmitForm').reset();
       state.uploadedPhotos = [];
       renderUploadedPhotos();
+      state.attachedFile = null;
+      renderAttachedHwpFile();
       var charCountEl = document.getElementById('charCount');
       if (charCountEl) charCountEl.textContent = '0';
       state.editingArticleId = null;
@@ -1593,6 +1704,9 @@
 
       state.uploadedPhotos = (article.photos || []).map(function(p) { return Object.assign({}, p); });
       renderUploadedPhotos();
+
+      state.attachedFile = article.attachment ? Object.assign({}, article.attachment) : null;
+      renderAttachedHwpFile();
 
       var editBanner = document.getElementById('editModeBanner');
       if (editBanner) {
@@ -1748,6 +1862,21 @@
           html += '</div>';
         });
         html += '</div></div>';
+      if (article.attachment) {
+        var attSize = (article.attachment.size / 1024).toFixed(1) + ' KB';
+        if (article.attachment.size > 1024 * 1024) attSize = (article.attachment.size / (1024 * 1024)).toFixed(2) + ' MB';
+        var attExt = (article.attachment.name.split('.').pop() || 'HWP').toUpperCase();
+
+        html += '<div class="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">';
+        html += '<div class="flex items-center gap-3 min-w-0">';
+        html += '<div class="w-11 h-11 rounded-xl bg-amber-600 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-sm">' + escapeHtml(attExt) + '</div>';
+        html += '<div class="min-w-0">';
+        html += '<div class="text-sm font-bold text-slate-900 truncate">' + escapeHtml(article.attachment.name) + '</div>';
+        html += '<div class="text-xs text-slate-500 flex items-center gap-2"><span>' + attSize + '</span><span>·</span><span>작성자 첨부 원고 파일</span></div>';
+        html += '</div></div>';
+        html += '<a href="' + article.attachment.data + '" download="' + escapeHtml(article.attachment.name) + '" class="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow transition flex items-center justify-center gap-1.5 shrink-0">';
+        html += '<i data-lucide="download" class="w-4 h-4"></i> 한글 파일 다운로드</a>';
+        html += '</div>';
       }
 
       html += '<div class="mb-6">';
@@ -1827,7 +1956,7 @@
           html += '<div class="w-12 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 text-xs font-bold">무사진</div>';
         }
         html += '<div><div class="font-bold text-sm text-slate-900 hover:text-blue-600 cursor-pointer" onclick="openArticleModal(\'' + article.id + '\')">' + escapeHtml(article.title) + '</div>';
-        html += '<div class="text-xs text-slate-400 flex items-center gap-2 mt-0.5"><span>사진 ' + (article.photos ? article.photos.length : 0) + '장</span><span>·</span><span>' + escapeHtml(article.targetGrade) + '</span></div></div></div></td>';
+        html += '<div class="text-xs text-slate-400 flex flex-wrap items-center gap-2 mt-0.5"><span>사진 ' + (article.photos ? article.photos.length : 0) + '장</span>' + (article.attachment ? '<span>·</span><a href="' + article.attachment.data + '" download="' + escapeHtml(article.attachment.name) + '" class="text-amber-700 font-bold hover:underline flex items-center gap-0.5" title="한글 파일 다운로드"><i data-lucide="file-text" class="w-3 h-3"></i> ' + escapeHtml(article.attachment.name) + '</a>' : '') + '<span>·</span><span>' + escapeHtml(article.targetGrade) + '</span></div></div></div></td>';
         html += '<td class="px-4 py-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ' + cat.badgeClass + '">' + cat.name + '</span></td>';
         html += '<td class="px-4 py-3 text-xs font-bold text-slate-800">' + escapeHtml(article.authorName) + '</td>';
         html += '<td class="px-4 py-3 text-xs font-semibold">' + (isPrivate ? '<span class="text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">🔒 비공개</span>' : '<span class="text-slate-600">🌐 공개</span>') + '</td>';
