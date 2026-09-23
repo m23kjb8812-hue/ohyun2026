@@ -135,11 +135,11 @@
               <span>원고 등록</span>
             </button>
             <button type="button" onclick="requestTabAccess('gallery')" data-tab="gallery" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-              <i id="galleryLockIcon" data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i>
+              <span id="galleryLockContainer"><i data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i></span>
               <span>접수 현황</span>
             </button>
             <button type="button" onclick="requestTabAccess('admin')" data-tab="admin" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-              <i id="adminLockIcon" data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i>
+              <span id="adminLockContainer"><i data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i></span>
               <span>편집 관리 (엑셀)</span>
             </button>
           </nav>
@@ -918,29 +918,6 @@
       }
     };
 
-    function openAdminAuthModal() {
-      var modal = document.getElementById('adminAuthModal');
-      var input = document.getElementById('adminPasswordInput');
-      if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-      }
-      if (input) {
-        input.value = '';
-        setTimeout(function() { input.focus(); }, 100);
-      }
-      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
-    }
-
-    window.closeAdminAuthModal = function() {
-      var modal = document.getElementById('adminAuthModal');
-      if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-      }
-      state.pendingTabTarget = null;
-    };
-
     window.handleAdminAuthSubmit = async function(e) {
       if (e && e.preventDefault) e.preventDefault();
       var input = document.getElementById('adminPasswordInput');
@@ -982,33 +959,22 @@
     function updateAdminUI() {
       var statusBadge = document.getElementById('adminStatusBadge');
       var statusBadgeMob = document.getElementById('adminStatusBadgeMobile');
-      var galleryLock = document.getElementById('galleryLockIcon');
-      var adminLock = document.getElementById('adminLockIcon');
+      var galleryLock = document.getElementById('galleryLockContainer');
+      var adminLock = document.getElementById('adminLockContainer');
 
       if (state.isAdmin) {
         if (statusBadge) { statusBadge.classList.remove('hidden'); statusBadge.classList.add('md:inline-flex'); }
         if (statusBadgeMob) { statusBadgeMob.classList.remove('hidden'); statusBadgeMob.classList.add('inline-flex'); }
-        if (galleryLock) { galleryLock.setAttribute('data-lucide', 'unlock'); galleryLock.className = 'w-3.5 h-3.5 text-emerald-600'; }
-        if (adminLock) { adminLock.setAttribute('data-lucide', 'unlock'); adminLock.className = 'w-3.5 h-3.5 text-emerald-600'; }
+        if (galleryLock) { galleryLock.innerHTML = '<i data-lucide="unlock" class="w-3.5 h-3.5 text-emerald-600"></i>'; }
+        if (adminLock) { adminLock.innerHTML = '<i data-lucide="unlock" class="w-3.5 h-3.5 text-emerald-600"></i>'; }
       } else {
         if (statusBadge) { statusBadge.classList.add('hidden'); statusBadge.classList.remove('md:inline-flex'); }
         if (statusBadgeMob) { statusBadgeMob.classList.add('hidden'); statusBadgeMob.classList.remove('inline-flex'); }
-        if (galleryLock) { galleryLock.setAttribute('data-lucide', 'lock'); galleryLock.className = 'w-3.5 h-3.5 text-slate-400'; }
-        if (adminLock) { adminLock.setAttribute('data-lucide', 'lock'); adminLock.className = 'w-3.5 h-3.5 text-slate-400'; }
+        if (galleryLock) { galleryLock.innerHTML = '<i data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i>'; }
+        if (adminLock) { adminLock.innerHTML = '<i data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i>'; }
       }
       try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
     }
-
-    window.openChangePasswordModal = function() {
-      var modal = document.getElementById('changePwModal');
-      if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
-      try { if (window.lucide) window.lucide.createIcons(); } catch (e) {}
-    };
-
-    window.closeChangePasswordModal = function() {
-      var modal = document.getElementById('changePwModal');
-      if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
-    };
 
     window.handleChangePasswordSubmit = async function(e) {
       if (e && e.preventDefault) e.preventDefault();
